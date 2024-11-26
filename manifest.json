@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Bluesky Comments Extension",
+  "version": "1.0",
+  "description": "Displays a Bluesky comments feed for the current page.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Bluesky Comments"
+  },
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": [
+    "https://bsky.social/*",
+    "https://bsky.app/*",
+    "https://*.bsky.social/*",
+    "https://*.bsky.app/*",
+    "https://*.bsky.team/*",
+    "https://public.api.bsky.app/*"
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

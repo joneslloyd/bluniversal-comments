@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Bluesky Comments</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 300px;
+            height: 500px;
+            overflow: auto;
+            font-family: Arial, sans-serif;
+        }
+
+        #status-container {
+            padding: 10px;
+        }
+
+        #comments-container {
+            padding: 10px;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="status-container"></div>
+    <div id="comments-container"></div>
+
+    <script src="bluesky-comments.js"></script>
+    <script src="popup.js"></script>
+</body>
+
+</html>
