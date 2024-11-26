@@ -6,18 +6,10 @@ import "sst"
 export {}
 declare module "sst" {
   export interface Resource {
-    "BsPassword": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
     "BsPoster": {
       "name": string
       "type": "sst.aws.Function"
       "url": string
-    }
-    "BsUsername": {
-      "type": "sst.sst.Secret"
-      "value": string
     }
   }
 }
