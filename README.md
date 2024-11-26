@@ -11,6 +11,8 @@ https://gist.github.com/LoueeD/b7dec10b2ea56c825cbb0b3a514720ed
 
 I decided to make a Chrome Extension to bring Bluesky comments to any web page :)
 
+![bluesky-comments](https://github.com/user-attachments/assets/74f6389a-8273-4c56-b44f-b9fe72095355)
+
 # How to use
 
 ## Download this code
