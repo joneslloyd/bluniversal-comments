@@ -315,7 +315,8 @@ class BskyComments extends HTMLElement {
       }
       .reply-info {
         font-size: 14px;
-        margin-bottom: 1em;
+        margin-top: 0; 
+        margin-bottom: 1.2em;
         color: #3c4043;
       }
       #show-more {
