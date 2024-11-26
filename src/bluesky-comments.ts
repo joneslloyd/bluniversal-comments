@@ -1,19 +1,47 @@
-// bluesky-comments.js
+// src/scripts/bluesky-comments.ts
+
+interface Author {
+  handle: string;
+  displayName?: string;
+  avatar?: string;
+}
+
+interface Post {
+  uri: string;
+  author: Author;
+  record: {
+    text?: string;
+    createdAt: string;
+  };
+  likeCount?: number;
+  replyCount?: number;
+}
+
+interface Reply {
+  post: Post;
+  replies?: Reply[];
+}
 
 class BskyComments extends HTMLElement {
+  visibleCount: number;
+  thread: Reply | null;
+  error: any;
+  refreshInterval: number | undefined;
+  postUri: string | undefined;
+
   constructor() {
     super();
-    this.attachShadow({ mode: "open" });
+    this.attachShadow({ mode: 'open' });
     this.visibleCount = 3;
     this.thread = null;
     this.error = null;
-    this.refreshInterval = null;
+    this.refreshInterval = undefined;
   }
 
   connectedCallback() {
-    const postUri = this.getAttribute("post");
+    const postUri = this.getAttribute('post');
     if (!postUri) {
-      this.renderError("Post URI is required");
+      this.renderError('Post URI is required');
       return;
     }
     this.postUri = postUri;
@@ -26,9 +54,11 @@ class BskyComments extends HTMLElement {
   }
 
   startAutoRefresh() {
-    this.refreshInterval = setInterval(() => {
-      this.loadThread(this.postUri, true);
-    }, 10000);
+    this.refreshInterval = window.setInterval(() => {
+      if (this.postUri) {
+        this.loadThread(this.postUri, true);
+      }
+    }, 60000); // Refresh every 60 seconds
   }
 
   stopAutoRefresh() {
@@ -37,7 +67,7 @@ class BskyComments extends HTMLElement {
     }
   }
 
-  async loadThread(uri, isAutoRefresh = false) {
+  async loadThread(uri: string, isAutoRefresh = false) {
     try {
       const thread = await this.fetchThread(uri);
       this.thread = thread;
@@ -46,11 +76,14 @@ class BskyComments extends HTMLElement {
       if (!isAutoRefresh) {
         this.dispatchEvent(new Event('commentsLoaded'));
       }
-    } catch (err) {
-      if (err.message.includes('ExpiredToken') || err.message.includes('Token has expired')) {
+    } catch (err: any) {
+      if (
+        err.message.includes('ExpiredToken') ||
+        err.message.includes('Token has expired')
+      ) {
         try {
-          const accessToken = await this.refreshAccessToken();
-          const thread = await this.fetchThread(uri, accessToken);
+          const newAccessToken = await this.refreshAccessToken();
+          const thread = await this.fetchThread(uri, newAccessToken);
           this.thread = thread;
           this.render();
 
@@ -58,22 +91,30 @@ class BskyComments extends HTMLElement {
             this.dispatchEvent(new Event('commentsLoaded'));
           }
         } catch (refreshError) {
-          this.renderError("Session expired. Please log in again.");
-          chrome.storage.sync.remove(['blueskyAccessJwt', 'blueskyRefreshJwt', 'blueskyDid', 'blueskyHandle']);
+          this.renderError('Session expired. Please log in again.');
+          chrome.storage.sync.remove([
+            'blueskyAccessJwt',
+            'blueskyRefreshJwt',
+            'blueskyDid',
+            'blueskyHandle',
+          ]);
         }
       } else {
-        this.renderError("Error loading comments");
+        this.renderError('Error loading comments');
       }
     }
   }
 
-  async fetchThread(uri, accessToken = null) {
-    if (!uri || typeof uri !== "string") {
-      throw new Error("Invalid URI: A valid string URI is required.");
+  async fetchThread(
+    uri: string,
+    accessToken: string | null = null,
+  ): Promise<Reply> {
+    if (!uri || typeof uri !== 'string') {
+      throw new Error('Invalid URI: A valid string URI is required.');
     }
 
     if (!accessToken) {
-      accessToken = await new Promise((resolve) => {
+      accessToken = await new Promise<string>((resolve) => {
         chrome.storage.sync.get(['blueskyAccessJwt'], (items) => {
           resolve(items.blueskyAccessJwt);
         });
@@ -84,12 +125,12 @@ class BskyComments extends HTMLElement {
     const url = `https://bsky.social/xrpc/app.bsky.feed.getPostThread?${params.toString()}`;
 
     const response = await fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        Accept: "application/json",
+        Accept: 'application/json',
         Authorization: `Bearer ${accessToken}`,
       },
-      cache: "no-store",
+      cache: 'no-store',
     });
 
     if (!response.ok) {
@@ -103,26 +144,29 @@ class BskyComments extends HTMLElement {
     const data = await response.json();
 
     if (!data.thread) {
-      throw new Error("No comments found");
+      throw new Error('No comments found');
     }
 
     return data.thread;
   }
 
-  async refreshAccessToken() {
-    const refreshToken = await new Promise((resolve) => {
+  async refreshAccessToken(): Promise<string> {
+    const refreshToken = await new Promise<string>((resolve) => {
       chrome.storage.sync.get(['blueskyRefreshJwt'], (items) => {
         resolve(items.blueskyRefreshJwt);
       });
     });
 
-    const response = await fetch('https://bsky.social/xrpc/com.atproto.server.refreshSession', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${refreshToken}`,
+    const response = await fetch(
+      'https://bsky.social/xrpc/com.atproto.server.refreshSession',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${refreshToken}`,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error('Failed to refresh access token');
@@ -142,21 +186,21 @@ class BskyComments extends HTMLElement {
 
   render() {
     if (!this.thread) {
-      this.renderError("No comments found");
+      this.renderError('No comments found');
       return;
     }
 
     const replies = this.thread.replies || [];
     const sortedReplies = replies.sort(
-      (a, b) => (b.post.likeCount ?? 0) - (a.post.likeCount ?? 0)
+      (a: Reply, b: Reply) => (b.post.likeCount ?? 0) - (a.post.likeCount ?? 0),
     );
 
-    const container = document.createElement("div");
+    const container = document.createElement('div');
     container.innerHTML = `
       <comments>
         <p class="reply-info">
           Reply on Bluesky
-          <a href="https://bsky.app/profile/${this.thread.post?.author?.handle}/post/${this.thread.post?.uri.split("/").pop()}" target="_blank" rel="noopener noreferrer">
+          <a href="https://bsky.app/profile/${this.thread.post?.author?.handle}/post/${this.thread.post?.uri.split('/').pop()}" target="_blank" rel="noopener noreferrer">
             here
           </a> to join the conversation.
         </p>
@@ -167,37 +211,52 @@ class BskyComments extends HTMLElement {
       </comments>
     `;
 
-    const commentsContainer = container.querySelector("#comments");
+    const commentsContainer = container.querySelector(
+      '#comments',
+    ) as HTMLElement;
     commentsContainer.innerHTML = '';
-    sortedReplies.slice(0, this.visibleCount).forEach((reply) => {
+    sortedReplies.slice(0, this.visibleCount).forEach((reply: Reply) => {
       commentsContainer.appendChild(this.createCommentElement(reply));
     });
 
-    const showMoreButton = container.querySelector("#show-more");
+    const showMoreButton = container.querySelector(
+      '#show-more',
+    ) as HTMLButtonElement;
     if (this.visibleCount >= sortedReplies.length) {
-      showMoreButton.style.display = "none";
+      showMoreButton.style.display = 'none';
     } else {
-      showMoreButton.style.display = "block";
+      showMoreButton.style.display = 'block';
     }
-    showMoreButton.addEventListener("click", () => {
+    showMoreButton.addEventListener('click', () => {
       this.visibleCount += 5;
       this.render();
     });
 
-    this.shadowRoot.innerHTML = "";
-    this.shadowRoot.appendChild(container);
+    this.shadowRoot!.innerHTML = '';
+    this.shadowRoot!.appendChild(container);
 
-    if (!this.hasAttribute("no-css")) {
+    if (!this.hasAttribute('no-css')) {
       this.addStyles();
     }
   }
 
-  createCommentElement(reply) {
-    const comment = document.createElement("div");
-    comment.classList.add("comment");
+  createCommentElement(reply: Reply): HTMLElement {
+    const comment = document.createElement('div');
+    comment.classList.add('comment');
 
     const author = reply.post.author;
-    const text = reply.post.record?.text || "";
+    const text = reply.post.record?.text || '';
+    const userLocale = navigator?.language ?? 'en-GB';
+    const date = new Date(reply.post.record.createdAt).toLocaleString(
+      userLocale,
+      {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      },
+    );
 
     comment.innerHTML = `
       <div class="author">
@@ -207,18 +266,21 @@ class BskyComments extends HTMLElement {
         </a>
         <p class="comment-text">${text}</p>
         <small class="comment-meta">
-          ${reply.post.likeCount ?? 0} likes • ${reply.post.replyCount ?? 0} replies
+          ${reply.post.likeCount ?? 0} likes • ${reply.post.replyCount ?? 0} replies • ${date}
         </small>
       </div>
     `;
 
     if (reply.replies && reply.replies.length > 0) {
-      const repliesContainer = document.createElement("div");
-      repliesContainer.classList.add("replies-container");
+      const repliesContainer = document.createElement('div');
+      repliesContainer.classList.add('replies-container');
 
       reply.replies
-        .sort((a, b) => (b.post.likeCount ?? 0) - (a.post.likeCount ?? 0))
-        .forEach((childReply) => {
+        .sort(
+          (a: Reply, b: Reply) =>
+            (b.post.likeCount ?? 0) - (a.post.likeCount ?? 0),
+        )
+        .forEach((childReply: Reply) => {
           repliesContainer.appendChild(this.createCommentElement(childReply));
         });
 
@@ -228,19 +290,19 @@ class BskyComments extends HTMLElement {
     return comment;
   }
 
-  renderError(message) {
+  renderError(message: string) {
     const container = document.createElement('div');
     container.innerHTML = `
       <p class="error">${message}</p>
       <p class="no-comments">No comments yet. Be the first to start the conversation on <a href="https://bsky.app/" target="_blank">Bluesky</a>!</p>
     `;
-    this.shadowRoot.innerHTML = '';
-    this.shadowRoot.appendChild(container);
+    this.shadowRoot!.innerHTML = '';
+    this.shadowRoot!.appendChild(container);
     this.addStyles();
   }
 
   addStyles() {
-    const style = document.createElement("style");
+    const style = document.createElement('style');
     style.textContent = `
       comments {
         margin: 0 auto;
@@ -299,14 +361,13 @@ class BskyComments extends HTMLElement {
       .comment-meta {
         color: #5f6368;
         display: block;
-        font-size: 12px;
       }
       .replies-container {
         border-left: 2px solid #e0e0e0;
         margin-left: 1em;
         padding-left: 1em;
       }
-      .error {
+              .error {
         color: #d93025;
         padding: 1em;
         text-align: center;
@@ -317,9 +378,10 @@ class BskyComments extends HTMLElement {
         font-size: 14px;
         margin-top: 1em;
       }
+
     `;
-    this.shadowRoot.appendChild(style);
+    this.shadowRoot!.appendChild(style);
   }
 }
 
-customElements.define("bsky-comments", BskyComments);
+customElements.define('bsky-comments', BskyComments);

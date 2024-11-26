@@ -1,0 +1,19 @@
+{
+  "name": "bluesky-comments-extension",
+  "version": "1.0.0",
+  "description": "Displays a Bluesky comments feed for the current page.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && cp src/manifest.json dist/manifest.json && cp -r src/assets/icons/ dist/assets/icons/",
+    "watch": "vite build --watch",
+    "preview": "vite preview",
+    "prettier": "prettier --write \"**/*.{ts,html,json}\""
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.192",
+    "prettier": "^3.3.3",
+    "terser": "^5.36.0",
+    "typescript": "^5.7.2",
+    "vite": "^4.5.5"
+  }
+}
