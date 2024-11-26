@@ -7,6 +7,7 @@ class BskyComments extends HTMLElement {
     this.visibleCount = 3;
     this.thread = null;
     this.error = null;
+    this.refreshInterval = null;
   }
 
   connectedCallback() {
@@ -15,16 +16,36 @@ class BskyComments extends HTMLElement {
       this.renderError("Post URI is required");
       return;
     }
-    this.loadThread(postUri);
+    this.postUri = postUri;
+    this.loadThread(this.postUri);
+    this.startAutoRefresh();
   }
 
-  async loadThread(uri) {
+  disconnectedCallback() {
+    this.stopAutoRefresh();
+  }
+
+  startAutoRefresh() {
+    this.refreshInterval = setInterval(() => {
+      this.loadThread(this.postUri, true);
+    }, 10000);
+  }
+
+  stopAutoRefresh() {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
+  }
+
+  async loadThread(uri, isAutoRefresh = false) {
     try {
       const thread = await this.fetchThread(uri);
       this.thread = thread;
       this.render();
 
-      this.dispatchEvent(new Event('commentsLoaded'));
+      if (!isAutoRefresh) {
+        this.dispatchEvent(new Event('commentsLoaded'));
+      }
     } catch (err) {
       if (err.message.includes('ExpiredToken') || err.message.includes('Token has expired')) {
         try {
@@ -33,7 +54,9 @@ class BskyComments extends HTMLElement {
           this.thread = thread;
           this.render();
 
-          this.dispatchEvent(new Event('commentsLoaded'));
+          if (!isAutoRefresh) {
+            this.dispatchEvent(new Event('commentsLoaded'));
+          }
         } catch (refreshError) {
           this.renderError("Session expired. Please log in again.");
           chrome.storage.sync.remove(['blueskyAccessJwt', 'blueskyRefreshJwt', 'blueskyDid', 'blueskyHandle']);
@@ -145,6 +168,7 @@ class BskyComments extends HTMLElement {
     `;
 
     const commentsContainer = container.querySelector("#comments");
+    commentsContainer.innerHTML = '';
     sortedReplies.slice(0, this.visibleCount).forEach((reply) => {
       commentsContainer.appendChild(this.createCommentElement(reply));
     });
@@ -152,6 +176,8 @@ class BskyComments extends HTMLElement {
     const showMoreButton = container.querySelector("#show-more");
     if (this.visibleCount >= sortedReplies.length) {
       showMoreButton.style.display = "none";
+    } else {
+      showMoreButton.style.display = "block";
     }
     showMoreButton.addEventListener("click", () => {
       this.visibleCount += 5;

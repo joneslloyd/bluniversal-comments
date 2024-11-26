@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       commentsContainer.appendChild(bskyComments);
 
-      // Remove status messages once comments have loaded
       bskyComments.addEventListener('commentsLoaded', () => {
         statusContainer.innerHTML = '';
       });
@@ -59,7 +58,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           commentsContainer.appendChild(bskyComments);
 
-          // Remove status messages once comments have loaded
           bskyComments.addEventListener('commentsLoaded', () => {
             statusContainer.innerHTML = '';
           });
