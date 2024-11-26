@@ -1,3 +1,5 @@
+// popup.js
+
 document.addEventListener('DOMContentLoaded', async () => {
   const commentsContainer = document.getElementById('comments-container');
   const statusContainer = document.getElementById('status-container');
@@ -8,8 +10,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   pageUrl = normalizeUrl(pageUrl);
 
-  chrome.storage.sync.get(['blueskyAccessJwt', 'blueskyDid'], async (items) => {
-    const accessToken = items.blueskyAccessJwt;
+  chrome.storage.sync.get(['blueskyAccessJwt', 'blueskyRefreshJwt', 'blueskyDid'], async (items) => {
+    let accessToken = items.blueskyAccessJwt;
+    const refreshToken = items.blueskyRefreshJwt;
     const did = items.blueskyDid;
 
     if (!accessToken || !did) {
@@ -37,7 +40,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       commentsContainer.appendChild(bskyComments);
     } catch (error) {
-      statusContainer.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+      if (error.message.includes('ExpiredToken') || error.message.includes('Token has expired')) {
+        try {
+          // Attempt to refresh the access token
+          accessToken = await refreshAccessToken(refreshToken);
+          // Retry the operation with the new access token
+          if (!postUri) {
+            postUri = await createNewPost(did, accessToken, pageUrl, pageTitle);
+          }
+          statusContainer.innerHTML = '<p class="success">Session refreshed. Loading comments...</p>';
+
+          const bskyComments = document.createElement('bsky-comments');
+          bskyComments.setAttribute('post', postUri);
+
+          commentsContainer.appendChild(bskyComments);
+        } catch (refreshError) {
+          // If refreshing fails, prompt the user to log in again
+          statusContainer.innerHTML = '<p class="error">Session expired. Please log in again via the <a href="options.html" target="_blank">extension options</a>.</p>';
+          // Clear stored tokens
+          chrome.storage.sync.remove(['blueskyAccessJwt', 'blueskyRefreshJwt', 'blueskyDid', 'blueskyHandle']);
+        }
+      } else {
+        statusContainer.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+      }
     }
   });
 });
@@ -166,10 +191,40 @@ async function createNewPost(did, accessToken, pageUrl, pageTitle) {
 
   if (!response.ok) {
     const errorText = await response.text();
+    if (errorText.includes('ExpiredToken')) {
+      throw new Error('ExpiredToken');
+    }
     throw new Error(`Failed to create post: ${response.statusText}\n${errorText}`);
   }
 
   const data = await response.json();
 
   return data.uri;
+}
+
+// Function to refresh the access token
+async function refreshAccessToken(refreshToken) {
+  const response = await fetch('https://bsky.social/xrpc/com.atproto.server.refreshSession', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${refreshToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to refresh access token');
+  }
+
+  const data = await response.json();
+
+  // Store the new tokens
+  chrome.storage.sync.set({
+    blueskyAccessJwt: data.accessJwt,
+    blueskyRefreshJwt: data.refreshJwt,
+    blueskyDid: data.did,
+    blueskyHandle: data.handle,
+  });
+
+  return data.accessJwt;
 }

@@ -1,3 +1,5 @@
+// bluesky-comments.js
+
 class BskyComments extends HTMLElement {
   constructor() {
     super();
@@ -22,20 +24,35 @@ class BskyComments extends HTMLElement {
       this.thread = thread;
       this.render();
     } catch (err) {
-      this.renderError("Error loading comments");
+      if (err.message.includes('ExpiredToken') || err.message.includes('Token has expired')) {
+        try {
+          const accessToken = await this.refreshAccessToken();
+          const thread = await this.fetchThread(uri, accessToken);
+          this.thread = thread;
+          this.render();
+        } catch (refreshError) {
+          this.renderError("Session expired. Please log in again.");
+          // Clear stored tokens
+          chrome.storage.sync.remove(['blueskyAccessJwt', 'blueskyRefreshJwt', 'blueskyDid', 'blueskyHandle']);
+        }
+      } else {
+        this.renderError("Error loading comments");
+      }
     }
   }
 
-  async fetchThread(uri) {
+  async fetchThread(uri, accessToken = null) {
     if (!uri || typeof uri !== "string") {
       throw new Error("Invalid URI: A valid string URI is required.");
     }
 
-    const accessToken = await new Promise((resolve) => {
-      chrome.storage.sync.get(['blueskyAccessJwt'], (items) => {
-        resolve(items.blueskyAccessJwt);
+    if (!accessToken) {
+      accessToken = await new Promise((resolve) => {
+        chrome.storage.sync.get(['blueskyAccessJwt'], (items) => {
+          resolve(items.blueskyAccessJwt);
+        });
       });
-    });
+    }
 
     const params = new URLSearchParams({ uri });
     const url = `https://bsky.social/xrpc/app.bsky.feed.getPostThread?${params.toString()}`;
@@ -51,6 +68,9 @@ class BskyComments extends HTMLElement {
 
     if (!response.ok) {
       const errorText = await response.text();
+      if (errorText.includes('ExpiredToken')) {
+        throw new Error('ExpiredToken');
+      }
       throw new Error(`Failed to fetch thread: ${response.statusText}`);
     }
 
@@ -61,6 +81,38 @@ class BskyComments extends HTMLElement {
     }
 
     return data.thread;
+  }
+
+  async refreshAccessToken() {
+    const refreshToken = await new Promise((resolve) => {
+      chrome.storage.sync.get(['blueskyRefreshJwt'], (items) => {
+        resolve(items.blueskyRefreshJwt);
+      });
+    });
+
+    const response = await fetch('https://bsky.social/xrpc/com.atproto.server.refreshSession', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${refreshToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to refresh access token');
+    }
+
+    const data = await response.json();
+
+    // Store the new tokens
+    chrome.storage.sync.set({
+      blueskyAccessJwt: data.accessJwt,
+      blueskyRefreshJwt: data.refreshJwt,
+      blueskyDid: data.did,
+      blueskyHandle: data.handle,
+    });
+
+    return data.accessJwt;
   }
 
   render() {
