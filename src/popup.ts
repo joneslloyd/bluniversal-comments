@@ -145,10 +145,9 @@ function normalizeUrl(url: string): string {
 
 async function searchForPost(pageUrl: string): Promise<string | null> {
   const searchParams = new URLSearchParams({
-    q: 'Discussing',
-    tag: 'BlueskyComments',
-    url: pageUrl,
+    q: pageUrl,
     limit: '1',
+    sort: 'top'
   });
 
   const searchUrl = `https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?${searchParams.toString()}`;
