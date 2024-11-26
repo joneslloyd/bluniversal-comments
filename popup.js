@@ -39,12 +39,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       bskyComments.setAttribute('post', postUri);
 
       commentsContainer.appendChild(bskyComments);
+
+      // Remove status messages once comments have loaded
+      bskyComments.addEventListener('commentsLoaded', () => {
+        statusContainer.innerHTML = '';
+      });
+
     } catch (error) {
       if (error.message.includes('ExpiredToken') || error.message.includes('Token has expired')) {
         try {
-          // Attempt to refresh the access token
           accessToken = await refreshAccessToken(refreshToken);
-          // Retry the operation with the new access token
           if (!postUri) {
             postUri = await createNewPost(did, accessToken, pageUrl, pageTitle);
           }
@@ -54,10 +58,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           bskyComments.setAttribute('post', postUri);
 
           commentsContainer.appendChild(bskyComments);
+
+          // Remove status messages once comments have loaded
+          bskyComments.addEventListener('commentsLoaded', () => {
+            statusContainer.innerHTML = '';
+          });
+
         } catch (refreshError) {
-          // If refreshing fails, prompt the user to log in again
           statusContainer.innerHTML = '<p class="error">Session expired. Please log in again via the <a href="options.html" target="_blank">extension options</a>.</p>';
-          // Clear stored tokens
           chrome.storage.sync.remove(['blueskyAccessJwt', 'blueskyRefreshJwt', 'blueskyDid', 'blueskyHandle']);
         }
       } else {
@@ -202,7 +210,6 @@ async function createNewPost(did, accessToken, pageUrl, pageTitle) {
   return data.uri;
 }
 
-// Function to refresh the access token
 async function refreshAccessToken(refreshToken) {
   const response = await fetch('https://bsky.social/xrpc/com.atproto.server.refreshSession', {
     method: 'POST',
@@ -218,7 +225,6 @@ async function refreshAccessToken(refreshToken) {
 
   const data = await response.json();
 
-  // Store the new tokens
   chrome.storage.sync.set({
     blueskyAccessJwt: data.accessJwt,
     blueskyRefreshJwt: data.refreshJwt,

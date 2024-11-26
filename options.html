@@ -6,13 +6,15 @@
     <title>Bluesky Comments Extension Options</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
+            background-color: #f9f9f9;
         }
 
         label {
             display: block;
             margin-top: 10px;
+            color: #202124;
         }
 
         input[type="text"],
@@ -21,6 +23,10 @@
             padding: 8px;
             margin-top: 5px;
             box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
         }
 
         button {
@@ -28,6 +34,16 @@
             padding: 10px;
             width: 100%;
             font-size: 16px;
+            background-color: #1a73e8;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        button:hover {
+            background-color: #1669bb;
         }
 
         #status {

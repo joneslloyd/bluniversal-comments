@@ -23,6 +23,8 @@ class BskyComments extends HTMLElement {
       const thread = await this.fetchThread(uri);
       this.thread = thread;
       this.render();
+
+      this.dispatchEvent(new Event('commentsLoaded'));
     } catch (err) {
       if (err.message.includes('ExpiredToken') || err.message.includes('Token has expired')) {
         try {
@@ -30,9 +32,10 @@ class BskyComments extends HTMLElement {
           const thread = await this.fetchThread(uri, accessToken);
           this.thread = thread;
           this.render();
+
+          this.dispatchEvent(new Event('commentsLoaded'));
         } catch (refreshError) {
           this.renderError("Session expired. Please log in again.");
-          // Clear stored tokens
           chrome.storage.sync.remove(['blueskyAccessJwt', 'blueskyRefreshJwt', 'blueskyDid', 'blueskyHandle']);
         }
       } else {
@@ -104,7 +107,6 @@ class BskyComments extends HTMLElement {
 
     const data = await response.json();
 
-    // Store the new tokens
     chrome.storage.sync.set({
       blueskyAccessJwt: data.accessJwt,
       blueskyRefreshJwt: data.refreshJwt,
@@ -204,10 +206,11 @@ class BskyComments extends HTMLElement {
     const container = document.createElement('div');
     container.innerHTML = `
       <p class="error">${message}</p>
-      <p>No comments yet. Be the first to start the conversation on <a href="https://bsky.app/" target="_blank">Bluesky</a>!</p>
+      <p class="no-comments">No comments yet. Be the first to start the conversation on <a href="https://bsky.app/" target="_blank">Bluesky</a>!</p>
     `;
     this.shadowRoot.innerHTML = '';
     this.shadowRoot.appendChild(container);
+    this.addStyles();
   }
 
   addStyles() {
@@ -215,62 +218,78 @@ class BskyComments extends HTMLElement {
     style.textContent = `
       comments {
         margin: 0 auto;
-        padding: 1.2em;
+        padding: 1em;
         max-width: 280px;
         display: block;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       }
       .reply-info {
         font-size: 14px;
+        margin-bottom: 1em;
+        color: #3c4043;
       }
       #show-more {
         margin-top: 10px;
         width: 100%;
-        padding: 1em;
+        padding: 0.8em;
         font: inherit;
         box-sizing: border-box;
-        background: rgba(0,0,0,0.05);
-        border-radius: 0.8em;
+        background: #1a73e8;
+        color: #fff;
+        border-radius: 4px;
         cursor: pointer;
         border: 0;
       }
       #show-more:hover {
-        background: rgba(0,0,0,0.1);
+        background: #1669bb;
       }
       .comment {
-        margin-bottom: 2em;
+        margin-bottom: 1.5em;
       }
       .author a {
         font-size: 0.9em;
         margin-bottom: 0.4em;
-        display: inline-block;
-        color: gray;
+        display: inline-flex;
+        align-items: center;
+        color: #202124;
+        font-weight: bold;
         text-decoration: none;
       }
       .author a:hover {
         text-decoration: underline;
       }
       .author img {
-        margin-right: 0.4em;
+        margin-right: 0.6em;
         border-radius: 100%;
         vertical-align: middle;
       }
       .comment-text {
         margin: 5px 0;
+        line-height: 1.4;
+        color: #3c4043;
       }
       .comment-meta {
-        color: gray;
+        color: #5f6368;
         display: block;
-        margin: 1em 0 2em;
+        font-size: 12px;
       }
       .replies-container {
-        border-left: 1px solid #ccc;
-        margin-left: 1.6em;
-        padding-left: 1.6em;
+        border-left: 2px solid #e0e0e0;
+        margin-left: 1em;
+        padding-left: 1em;
       }
       .error {
-        color: red;
+        color: #d93025;
         padding: 1em;
         text-align: center;
+      }
+      .no-comments {
+        text-align: center;
+        color: #5f6368;
+        font-size: 14px;
+        margin-top: 1em;
       }
     `;
     this.shadowRoot.appendChild(style);
