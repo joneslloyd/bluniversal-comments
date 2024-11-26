@@ -53,26 +53,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         postUri = (await searchForPost(pageUrl)) || undefined;
 
         if (!postUri) {
-          statusContainer.innerHTML =
-            '<p>No existing post found. Creating a new post...</p>';
-          postUri = await createNewPost(did, accessToken, pageUrl, pageTitle);
-          statusContainer.innerHTML =
-            '<p class="success">A new post has been created for this page.</p>';
+          statusContainer.innerHTML = `
+            <p class="status-text">Create new post...</p>
+            <textarea id="user-post-text">${pageTitle}</textarea>            
+            <button id="user-post-button">Post</button>
+          `;
+
+
+          const postButton = document.getElementById('user-post-button');
+          if (postButton) {
+            postButton.addEventListener('click', async () => {
+              const textareaElement = document.getElementById('user-post-text') as HTMLTextAreaElement;
+              const textareaValue = textareaElement.value;
+              
+              postUri = await createNewPost(did, accessToken, pageUrl, textareaValue);
+              statusContainer.innerHTML =
+                '<p class="success">A new post has been created for this page.</p>';
+        
+              // Create and append the comments section after the post is created
+              const bskyComments = document.createElement('bsky-comments') as HTMLElement;
+              bskyComments.setAttribute('post', postUri);
+              commentsContainer.appendChild(bskyComments);
+        
+              bskyComments.addEventListener('commentsLoaded', () => {
+                statusContainer.innerHTML = '';
+              });
+            });
+          }
+
         } else {
           statusContainer.innerHTML =
             '<p>Loading comments from existing post...</p>';
+    
+          const bskyComments = document.createElement(
+            'bsky-comments',
+          ) as HTMLElement;
+
+          bskyComments.setAttribute('post', postUri);
+
+          commentsContainer.appendChild(bskyComments);
+
+          bskyComments.addEventListener('commentsLoaded', () => {
+            statusContainer.innerHTML = '';
+          });
         }
-
-        const bskyComments = document.createElement(
-          'bsky-comments',
-        ) as HTMLElement;
-        bskyComments.setAttribute('post', postUri);
-
-        commentsContainer.appendChild(bskyComments);
-
-        bskyComments.addEventListener('commentsLoaded', () => {
-          statusContainer.innerHTML = '';
-        });
       } catch (error: any) {
         if (
           error.message.includes('ExpiredToken') ||
@@ -180,7 +204,7 @@ async function createNewPost(
 ): Promise<string> {
   const now = new Date().toISOString();
 
-  const text = `Discussing "${pageTitle}"\n${pageUrl}\n\n#BlueskyComments`;
+  const text = `${pageTitle}\n\n${pageUrl}`;
 
   const facets: Facet[] = [];
 
@@ -210,20 +234,6 @@ async function createNewPost(
         {
           $type: 'app.bsky.richtext.facet#link',
           uri: pageUrl,
-        },
-      ],
-    });
-  }
-
-  const hashtag = '#BlueskyComments';
-  const tagIndices = getByteIndices(hashtag);
-  if (tagIndices) {
-    facets.push({
-      index: tagIndices,
-      features: [
-        {
-          $type: 'app.bsky.richtext.facet#tag',
-          tag: 'BlueskyComments',
         },
       ],
     });
