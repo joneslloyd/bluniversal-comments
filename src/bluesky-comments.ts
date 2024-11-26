@@ -196,14 +196,29 @@ class BskyComments extends HTMLElement {
     );
 
     const container = document.createElement('div');
+    const userLocale = navigator?.language ?? 'en-GB';
+    const postDate = new Date(this.thread.post.record.createdAt).toLocaleString(
+      userLocale,
+      {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      },
+    );
     container.innerHTML = `
       <comments>
-        <p class="reply-info">
-          Reply on Bluesky
-          <a href="https://bsky.app/profile/${this.thread.post?.author?.handle}/post/${this.thread.post?.uri.split('/').pop()}" target="_blank" rel="noopener noreferrer">
-            here
-          </a> to join the conversation.
-        </p>
+        <div class="author">
+          <a href="https://bsky.app/profile/${this.thread.post?.author?.handle}" target="_blank" rel="noopener noreferrer">
+            ${this.thread.post?.author?.avatar ? `<img width="22px" src="${this.thread.post?.author?.avatar}" />` : ''}
+            ${this.thread.post?.author?.displayName ?? this.thread.post?.author?.handle}
+          </a>
+          <p class="comment-text"><a class="comment-text" href="https://bsky.app/profile/${this.thread.post?.author?.handle}/post/${this.thread.post?.uri.split('/').pop()}" target="_blank" rel="noopener noreferrer">${this.thread.post.record?.text}</a></p>
+          <small class="comment-meta">
+            ${this.thread.post.likeCount ?? 0} likes • ${this.thread.post.replyCount ?? 0} replies • ${postDate}
+          </small>
+        </div>
         <div id="comments"></div>
         <button id="show-more">
           Show more comments
@@ -340,7 +355,7 @@ class BskyComments extends HTMLElement {
       }
       .author a {
         font-size: 0.9em;
-        margin-bottom: 0.4em;
+        margin-bottom: 0.2em;
         display: inline-flex;
         align-items: center;
         color: #202124;
@@ -356,7 +371,7 @@ class BskyComments extends HTMLElement {
         vertical-align: middle;
       }
       .comment-text {
-        margin: 5px 0;
+        margin: 2px 0 0 0;
         line-height: 1.4;
         color: #3c4043;
       }
