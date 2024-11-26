@@ -1,7 +1,7 @@
-import { bucket } from "./storage";
+import { bsPassword, bsUsername } from "./secrets";
 
-export const myApi = new sst.aws.Function("MyApi", {
+export const bsPoster = new sst.aws.Function("BsPoster", {
+  link: [bsUsername, bsPassword],
   url: true,
-  link: [bucket],
   handler: "packages/functions/src/api.handler"
 });

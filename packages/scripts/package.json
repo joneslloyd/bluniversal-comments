@@ -1,8 +1,8 @@
 {
-  "name": "@monorepo-template/scripts",
+  "name": "@bluniversal-comments/scripts",
   "version": "0.0.0",
   "dependencies": {
-    "@monorepo-template/core": "*",
+    "@bluniversal-comments/core": "workspace:*",
     "sst": "*"
   },
   "scripts": {

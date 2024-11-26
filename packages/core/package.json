@@ -1,5 +1,5 @@
 {
-  "name": "@monorepo-template/core",
+  "name": "@bluniversal-comments/core",
   "version": "0.0.0",
   "scripts": {
     "test": "sst shell vitest"
@@ -11,6 +11,7 @@
     ]
   },
   "dependencies": {
+    "crypto": "^1.0.1",
     "sst": "*"
   },
   "devDependencies": {
