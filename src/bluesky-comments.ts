@@ -335,6 +335,7 @@ class BskyComments extends HTMLElement {
       }
       .comment {
         margin-bottom: 1.5em;
+        margin-top: 1em;
       }
       .author a {
         font-size: 0.9em;
