@@ -1,0 +1,67 @@
+# Dependency directories
+node_modules/
+
+# Build output directories
+# INCLUDE dist, so that it just works
+# dist/
+
+# Temporary files and folders
+tmp/
+temp/
+.cache/
+
+# Log files
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Environment variable files
+.env
+.env.local
+.env.*.local
+
+# Mac system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+
+# IDE or Editor directories and files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Optional npm cache directory
+.npm/
+
+# ESLint cache
+.eslintcache
+
+# Stylelint cache
+.stylelintcache
+
+# Coverage directory used by testing tools
+coverage/
+
+# REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# JetBrains IDE files
+*.iml
+
+# Optional lock files (usually committed)
+# Uncomment if you don't want to commit lock files
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml

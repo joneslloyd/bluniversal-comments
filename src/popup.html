@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Bluesky Comments</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        width: 300px;
+        height: 500px;
+        overflow: auto;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f9f9f9;
+      }
+
+      #status-container {
+        padding: 10px;
+        background-color: #fff;
+        border-bottom: 1px solid #ddd;
+      }
+
+      #comments-container {
+        padding: 10px;
+      }
+
+      .error {
+        color: #d93025;
+      }
+
+      .success {
+        color: #188038;
+      }
+
+      a {
+        color: #1a73e8;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="status-container"></div>
+    <div id="comments-container"></div>
+
+    <script type="module" src="./popup.ts"></script>
+  </body>
+</html>

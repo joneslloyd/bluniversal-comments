@@ -21,7 +21,7 @@ However you please.
 ## Install the extension
 - Go here: chrome://extensions/
 - Enable dev mode (top right)
-- Add the folder containing this extension
+- Add the `dist` folder from this extension
 
 ## Activate it
 
