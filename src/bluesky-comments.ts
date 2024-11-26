@@ -264,7 +264,7 @@ class BskyComments extends HTMLElement {
           ${author.avatar ? `<img width="22px" src="${author.avatar}" />` : ''}
           ${author.displayName ?? author.handle}
         </a>
-        <p class="comment-text">${text}</p>
+        <p class="comment-text"><a class="comment-text" href="https://bsky.app/profile/${reply.post.author?.handle}/post/${reply.post.uri?.split('/').pop()}" target="_blank" rel="noopener noreferrer">${text}</a></p>
         <small class="comment-meta">
           ${reply.post.likeCount ?? 0} likes • ${reply.post.replyCount ?? 0} replies • ${date}
         </small>
@@ -360,6 +360,9 @@ class BskyComments extends HTMLElement {
         line-height: 1.4;
         color: #3c4043;
       }
+      .comment-text a { 
+        font-weight: normal;
+      }
       .comment-meta {
         color: #5f6368;
         display: block;
@@ -369,7 +372,7 @@ class BskyComments extends HTMLElement {
         margin-left: 1em;
         padding-left: 1em;
       }
-              .error {
+      .error {
         color: #d93025;
         padding: 1em;
         text-align: center;
