@@ -62,9 +62,17 @@ jobs:
         working-directory: ./packages/wxt
         run: pnpm wxt zip
 
+      # Debugging: List files in the output folder
+      - name: List Files in Output Folder
+        run: ls -l ./packages/wxt/.output || echo "No files found in the output folder"
+
       # Move the ZIP file to the root directory
       - name: Move ZIP to Root
-        run: mv ./packages/wxt/.output/*.zip ./
+        run: mv ./packages/wxt/.output/*.zip ./ || echo "No ZIP file found to move"
+
+      # Debugging: List files in the root directory
+      - name: List Files in Root
+        run: ls -l ./ || echo "No files found in the root directory"
 
       # Upload the ZIP file as a GitHub Release Artifact
       - name: Upload ZIP as Artifact
