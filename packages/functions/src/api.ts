@@ -1,13 +1,16 @@
 import { Handler } from "aws-lambda";
 import { BskyAgent } from "@atproto/api";
 import { formRecordPayload, searchForPost } from "./utils";
-import { generateTaggedUrl } from "@bluniversal-comments/core/utils";
+import {
+  BlueskyAgentManager,
+  generateTaggedUrl,
+  SessionData,
+} from "@bluniversal-comments/core/utils";
 
 interface PostCreatorProps {
   url: string;
   title: string;
-  timestamp: number;
-  hash: string;
+  sessionData: SessionData;
 }
 
 const isPayload = (data: any): data is PostCreatorProps => {
@@ -15,49 +18,24 @@ const isPayload = (data: any): data is PostCreatorProps => {
     typeof data === "object" &&
     typeof data.url === "string" &&
     typeof data.title === "string" &&
-    typeof data.timestamp === "number" &&
-    typeof data.hash === "string"
+    typeof data.sessionData === "object" &&
+    typeof data.sessionData.accessJwt === "string" &&
+    typeof data.sessionData.refreshJwt === "string" &&
+    typeof data.sessionData.handle === "string" &&
+    typeof data.sessionData.did === "string" &&
+    typeof data.sessionData.active === "boolean"
   );
 };
 
-async function generateHash(payload: string, secret: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const signature = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    encoder.encode(payload)
-  );
-  return Array.from(new Uint8Array(signature))
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-export const handler: Handler<
-  {
-    body: string;
-  },
-  {
-    statusCode: number;
-    body: string;
-  }
-> = async (event) => {
+export const handler: Handler = async (event) => {
   const username = process.env.username;
   const password = process.env.password;
 
   if (!username || !password) {
     throw new Error(
-      "Internal Bluniversal Comments error: Missing username or password."
+      "Internal Bluniversal Comments error: Missing username or password.",
     );
   }
-
-  const SHARED_SECRET = process.env.sharedSecret || "";
 
   try {
     let body: any;
@@ -78,54 +56,48 @@ export const handler: Handler<
       };
     }
 
-    const { url, title, timestamp, hash } = body;
+    const { url, title, sessionData } = body;
 
+    // Step 1: Ensure the post does not already exist
     const hashedTag = await generateTaggedUrl(url);
     const existingPostUri = await searchForPost(hashedTag);
 
-    if(existingPostUri) {
-            return {
+    if (existingPostUri) {
+      return {
         statusCode: 400,
         body: JSON.stringify({ error: "Post already exists" }),
       };
     }
 
-    const now = Math.floor(Date.now() / 1000);
-    if (Math.abs(now - timestamp) > 300) {
-      // Allow 5 minutes of drift
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Timestamp out of range" }),
-      };
-    }
+    // Step 2: Validate the user's accessJwt
+    const agentManager = new BlueskyAgentManager();
+    const isValidToken = await agentManager.validateUserSession(sessionData);
 
-    const payload = `${url}|${title}|${timestamp}`;
-    const calculatedHash = await generateHash(payload, SHARED_SECRET);
-
-    if (calculatedHash !== hash) {
+    if (!isValidToken) {
       return {
         statusCode: 403,
-        body: JSON.stringify({ error: "Invalid hash" }),
+        body: JSON.stringify({ error: "Invalid or expired user token." }),
       };
     }
 
-    const agent = new BskyAgent({
+    // Step 3: Use bot credentials to create the post
+    const botAgent = new BskyAgent({
       service: "https://bsky.social",
     });
 
-    await agent.login({
+    await botAgent.login({
       identifier: username,
       password: password,
     });
 
-    const did = agent?.did;
+    const did = botAgent?.did;
 
     if (!did) {
       throw new Error("Failed to retrieve DID from Bluesky.");
     }
 
     const recordPayload = await formRecordPayload(url, title);
-    const { uri } = await agent.post({
+    const { uri } = await botAgent.post({
       ...recordPayload,
       createdAt: new Date().toISOString(),
     });
@@ -133,6 +105,11 @@ export const handler: Handler<
     return {
       statusCode: 200,
       body: JSON.stringify({ uri }),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      },
     };
   } catch (error: any) {
     console.error("Error in Lambda function:", error);

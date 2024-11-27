@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { createNewPost } from "./utils";
+import { createNewPost, maybeInitializeDevModeAgent } from "../utils";
 import { searchForPost } from "../../../functions/src/utils";
 import BskyComments from "./BskyComments";
 import "./App.css";
@@ -20,7 +20,15 @@ const App: React.FC = () => {
   const agentManager = new BlueskyAgentManager();
 
   useEffect(() => {
+    maybeInitializeDevModeAgent(agentManager);
+  }, []);
+
+  useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+      if (tab.url && !isValidUrl(tab.url)) {
+        setErrorMessage("This page is not supported for Bluesky comments.");
+        return;
+      }
       setTabInfo({
         url: tab.url || "",
         title: tab.title || "",
@@ -31,10 +39,17 @@ const App: React.FC = () => {
   useEffect(() => {
     const initializePost = async () => {
       if (!tabInfo || creatingPost) return;
-      setCreatingPost(true);
-
       try {
-        agentManager.initialize();
+        setCreatingPost(true);
+
+        const isLoggedIn = await agentManager.isLoggedIn();
+        if (!isLoggedIn) {
+          setErrorMessage(
+            "Please go to the options page and enter your Bluesky username and password.",
+          );
+          return;
+        }
+
         const { url, title } = tabInfo;
 
         const normalizedUrl = normalizeUrl(url);
@@ -44,7 +59,18 @@ const App: React.FC = () => {
         let existingPostUri = await searchForPost(hashedTag);
         if (!existingPostUri) {
           setStatusMessage("No existing post found. Creating a new post...");
-          existingPostUri = await createNewPost(normalizedUrl, title);
+          const sessionData = await agentManager.getSessionFromStorage();
+          if (sessionData) {
+            existingPostUri = await createNewPost(
+              normalizedUrl,
+              title,
+              sessionData,
+            );
+          } else {
+            console.error("Failed to retrieve session data from storage.");
+            setErrorMessage("Failed to initialize the post. Please try again.");
+          }
+          setPostUri(existingPostUri);
         }
         setPostUri(existingPostUri);
         setStatusMessage("");
@@ -96,6 +122,20 @@ function normalizeUrl(url: string): string {
     return parsedUrl.toString().toLowerCase();
   } catch {
     return url.toLowerCase();
+  }
+}
+
+function isValidUrl(url: string): boolean {
+  try {
+    const parsedUrl = new URL(url);
+    return (
+      parsedUrl.protocol !== "about:" &&
+      parsedUrl.protocol !== "chrome-extension:" &&
+      !parsedUrl.hostname.includes("localhost") &&
+      !parsedUrl.hostname.includes("newtab")
+    );
+  } catch {
+    return false;
   }
 }
 

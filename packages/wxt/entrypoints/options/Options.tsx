@@ -1,20 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
+import { maybeInitializeDevModeAgent } from "../utils";
 
 const Options: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [sessionValid, setSessionValid] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Unified loading state
   const [editing, setEditing] = useState(false);
 
   const agentManager = new BlueskyAgentManager();
 
-  const checkSessionStatus = async () => {
-    setLoading(true);
-    setStatusMessage(null);
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        await maybeInitializeDevModeAgent(agentManager);
+        await checkSessionStatus(); // Check the session only after dev mode init
+      } catch (error) {
+        console.error("Error during initialization:", error);
+        setStatusMessage("Initialization failed. Please log in.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    initialize();
+  }, []); // Runs only once on component mount
+
+  const checkSessionStatus = async () => {
     try {
       const agent = await agentManager.getAgent();
       if (agent.session?.accessJwt) {
@@ -29,14 +43,8 @@ const Options: React.FC = () => {
       console.error("Error verifying session:", error);
       setSessionValid(false);
       setStatusMessage("Failed to verify session. Please log in.");
-    } finally {
-      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    checkSessionStatus();
-  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,35 +1,25 @@
-const generateHmac = async (
-  secret: string,
-  payload: string,
-): Promise<string> => {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: { name: "SHA-256" } },
-    false,
-    ["sign"],
-  );
-
-  const signature = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    encoder.encode(payload),
-  );
-
-  return Array.from(new Uint8Array(signature))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-};
+import {
+  BlueskyAgentManager,
+  SessionData,
+} from "@bluniversal-comments/core/utils";
 
 export async function createNewPost(
   pageUrl: string,
   pageTitle: string,
+  sessionData: SessionData,
 ): Promise<string> {
-  const sharedSecret = import.meta.env.WXT_BS_SHARED_SECRET;
-  const timestamp = Math.floor(Date.now() / 1000);
-  const payload = `${pageUrl}|${pageTitle}|${timestamp}`;
-  const hash = await generateHmac(sharedSecret, payload);
+  const agentManager = new BlueskyAgentManager();
+  const agent = await agentManager.getAgent();
+
+  if (!agent.session?.accessJwt) {
+    throw new Error("Session expired.");
+  }
+
+  const payload = {
+    url: pageUrl,
+    title: pageTitle,
+    sessionData,
+  };
 
   const lambdaUrl = import.meta.env.WXT_LAMBDA_URL;
 
@@ -38,19 +28,17 @@ export async function createNewPost(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      title: pageTitle,
-      url: pageUrl,
-      timestamp,
-      hash,
-    }),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
     throw new Error(`Failed to create post: ${response.statusText}`);
   }
 
-  return (await response.json()).uri;
+  const data = await response.json();
+
+  // Return the URI of the newly created post
+  return data.uri;
 }
 
 export async function refreshAccessToken(
@@ -79,3 +67,15 @@ export async function refreshAccessToken(
   });
   return data.accessJwt;
 }
+
+export const maybeInitializeDevModeAgent = async (agentManager: BlueskyAgentManager) => {
+  const devUsername = import.meta.env.WXT_BS_DEV_USERNAME;
+  const devPassword = import.meta.env.WXT_BS_DEV_PASSWORD;
+
+  if (devUsername && devPassword) {
+    await agentManager.login(devUsername, devPassword);
+    await agentManager.initialize();
+  }
+};
+
+export default maybeInitializeDevModeAgent;

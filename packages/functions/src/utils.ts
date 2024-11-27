@@ -2,15 +2,20 @@ import { AppBskyFeedPost, AppBskyRichtextFacet, BskyAgent } from "@atproto/api";
 import { generateTaggedUrl } from "@bluniversal-comments/core/utils";
 
 export const searchForPost = async (tag: string): Promise<string | null> => {
-
-  const agent = new BskyAgent({ service: 'https://public.api.bsky.app' });
-  const response = await agent.app.bsky.feed.searchPosts({q: `%23${tag}`, tag: [tag], author: "bluniversal.bsky.social", limit: 1, sort: 'top'});
+  const agent = new BskyAgent({ service: "https://public.api.bsky.app" });
+  const response = await agent.app.bsky.feed.searchPosts({
+    q: `%23${tag}`,
+    tag: [tag],
+    author: "bluniversal.bsky.social",
+    limit: 1,
+    sort: "top",
+  });
   if (!response.success) {
     throw new Error(`Failed to search for posts: ${response.data}`);
   }
   const data = response.data;
   return data.posts?.[0]?.uri || null;
-}
+};
 
 export const formRecordPayload = async (
   pageUrl: string,

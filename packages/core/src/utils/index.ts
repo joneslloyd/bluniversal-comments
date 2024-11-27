@@ -1,3 +1,4 @@
+import { BskyAgent } from "@atproto/api";
 import * as fs from "fs";
 
 export const generateTaggedUrl = async (pageUrl: string): Promise<string> => {
@@ -38,14 +39,12 @@ export const updateEnvFile = (envFilePath: string, apiUrl: string) => {
   }
 };
 
-import { BskyAgent } from "@atproto/api";
-
-interface SessionData {
-  blueskyAccessJwt: string;
-  blueskyRefreshJwt: string;
-  blueskyHandle: string;
-  blueskyDid: string;
-  blueskyActive: boolean;
+export interface SessionData {
+  accessJwt: string;
+  refreshJwt: string;
+  handle: string;
+  did: string;
+  active: boolean;
 }
 
 export class BlueskyAgentManager {
@@ -59,11 +58,11 @@ export class BlueskyAgentManager {
     const session = await this.getSessionFromStorage();
     if (session) {
       await this.agent.resumeSession({
-        accessJwt: session.blueskyAccessJwt,
-        refreshJwt: session.blueskyRefreshJwt,
-        handle: session.blueskyHandle,
-        did: session.blueskyDid,
-        active: session.blueskyActive,
+        accessJwt: session.accessJwt,
+        refreshJwt: session.refreshJwt,
+        handle: session.handle,
+        did: session.did,
+        active: session.active,
       });
       return true;
     }
@@ -93,11 +92,11 @@ export class BlueskyAgentManager {
 
       // Save refreshed session to Chrome storage
       this.saveSessionToStorage({
-        blueskyAccessJwt: refreshedSession.data.accessJwt,
-        blueskyRefreshJwt: refreshedSession.data.refreshJwt,
-        blueskyHandle: refreshedSession.data.handle,
-        blueskyDid: refreshedSession.data.did,
-        blueskyActive: true,
+        accessJwt: refreshedSession.data.accessJwt,
+        refreshJwt: refreshedSession.data.refreshJwt,
+        handle: refreshedSession.data.handle,
+        did: refreshedSession.data.did,
+        active: true,
       });
 
       // Update the agent's session
@@ -114,15 +113,54 @@ export class BlueskyAgentManager {
     }
   }
 
+  async validateUserSession(sessionData: {
+    accessJwt: string;
+    refreshJwt: string;
+    handle: string;
+    did: string;
+    active: boolean;
+  }): Promise<boolean> {
+    try {
+      await this.agent.resumeSession(sessionData);
+      return true;
+    } catch (error) {
+      console.error("Session validation failed:", error);
+
+      if ((error as any).error === "Invalid session") {
+        try {
+          const refreshedSession =
+            await this.agent.com.atproto.server.refreshSession(undefined, {
+              headers: { Authorization: `Bearer ${sessionData.refreshJwt}` },
+            });
+
+          await this.agent.resumeSession({
+            accessJwt: refreshedSession.data.accessJwt,
+            refreshJwt: refreshedSession.data.refreshJwt,
+            handle: refreshedSession.data.handle,
+            did: refreshedSession.data.did,
+            active: true,
+          });
+
+          return true; // Session is now valid
+        } catch (refreshError) {
+          console.error("Session refresh failed:", refreshError);
+          return false;
+        }
+      }
+
+      return false;
+    }
+  }
+
   async login(username: string, password: string): Promise<void> {
     await this.agent.login({ identifier: username, password });
     const session = this.agent.session!;
     this.saveSessionToStorage({
-      blueskyAccessJwt: session.accessJwt,
-      blueskyRefreshJwt: session.refreshJwt,
-      blueskyHandle: session.handle,
-      blueskyDid: session.did,
-      blueskyActive: true,
+      accessJwt: session.accessJwt,
+      refreshJwt: session.refreshJwt,
+      handle: session.handle,
+      did: session.did,
+      active: true,
     });
   }
 
@@ -132,7 +170,27 @@ export class BlueskyAgentManager {
     this.destroySessionFromStorage();
   }
 
-  private async getSessionFromStorage(): Promise<SessionData | null> {
+  async isLoggedIn(): Promise<boolean> {
+    try {
+      // Check if session exists
+      const session = await this.getSessionFromStorage();
+      if (session) {
+        // Validate the session
+        return await this.validateUserSession({
+          accessJwt: session.accessJwt,
+          refreshJwt: session.refreshJwt,
+          handle: session.handle,
+          did: session.did,
+          active: session.active ?? false,
+        });
+      }
+    } catch (error) {
+      console.error("isLoggedIn check failed:", error);
+    }
+    return false; // Not logged in if session is invalid or missing
+  }
+
+  public async getSessionFromStorage(): Promise<SessionData | null> {
     return new Promise((resolve) => {
       chrome.storage.sync.get(
         [
@@ -149,7 +207,13 @@ export class BlueskyAgentManager {
             items.blueskyHandle &&
             items.blueskyDid
           ) {
-            resolve(items as SessionData);
+            resolve({
+              accessJwt: items.blueskyAccessJwt,
+              refreshJwt: items.blueskyRefreshJwt,
+              handle: items.blueskyHandle,
+              did: items.blueskyDid,
+              active: items.blueskyActive,
+            });
           } else {
             resolve(null);
           }
@@ -159,7 +223,13 @@ export class BlueskyAgentManager {
   }
 
   private saveSessionToStorage(session: SessionData): void {
-    chrome.storage.sync.set(session);
+    chrome.storage.sync.set({
+      blueskyAccessJwt: session.accessJwt,
+      blueskyRefreshJwt: session.refreshJwt,
+      blueskyHandle: session.handle,
+      blueskyDid: session.did,
+      blueskyActive: session.active,
+    });
   }
 
   private destroySessionFromStorage(): void {
