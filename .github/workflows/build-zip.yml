@@ -25,22 +25,33 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
+      # Cache dependencies
+      - name: Cache pnpm Store
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       # Install dependencies
       - name: Install Dependencies
         run: pnpm install
 
-      # Export environment variables from root `.env`
-      - name: Export Root .env
+      # Load environment variables from root .env
+      - name: Load Root .env
         run: |
           if [ -f .env ]; then
-            export $(cat .env | grep -v '^#' | xargs)
+            echo "Loading root .env file..."
+            cat .env | grep -v '^#' >> $GITHUB_ENV
           fi
 
-      # Export environment variables from `./packages/wxt/.env`
-      - name: Export ./packages/wxt/.env
+      # Load environment variables from ./packages/wxt/.env
+      - name: Load ./packages/wxt/.env
         run: |
           if [ -f ./packages/wxt/.env ]; then
-            export $(cat ./packages/wxt/.env | grep -v '^#' | xargs)
+            echo "Loading ./packages/wxt/.env file..."
+            cat ./packages/wxt/.env | grep -v '^#' >> $GITHUB_ENV
           fi
 
       # Run the build command from ./packages/wxt/
@@ -51,6 +62,10 @@ jobs:
       # Move the ZIP file to the root directory
       - name: Move ZIP to Root
         run: mv ./packages/wxt/.output/*.zip ./
+
+      # List files in the root for debugging
+      - name: List Files in Root
+        run: ls -l ./
 
       # Upload the ZIP file as a GitHub Release Artifact
       - name: Upload ZIP as Artifact
