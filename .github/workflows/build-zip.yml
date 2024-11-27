@@ -89,7 +89,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v1.0.0
+          tag_name: v0.0.2
           release_name: Chrome Extension Release
           draft: false
           prerelease: false
