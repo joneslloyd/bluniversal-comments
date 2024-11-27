@@ -6,6 +6,9 @@ on:
       - main  # Trigger on pushes to the `main` branch
   workflow_dispatch:  # Allow manual runs
 
+permissions:
+  contents: write  # Allow GITHUB_TOKEN to create releases and upload assets
+
 jobs:
   build:
     runs-on: ubuntu-latest
