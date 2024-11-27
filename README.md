@@ -8,7 +8,7 @@ Bluniversal Comments is a Chrome Extension enabling "universal comments" via Blu
 
 ### Step 1: Download the Extension
 
-1. Visit the **[Releases](https://github.com/bluniversal-comments/releases)** page on the GitHub repository.
+1. Visit the **[Releases](https://github.com/joneslloyd/bluniversal-comments/releases)** page on the GitHub repository.
 2. Download the latest `.zip` file for the extension.
 
 ### Step 2: Install the Extension
@@ -63,7 +63,7 @@ For more details, read the full [SSPL License](https://www.mongodb.com/licensing
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-repo-name/bluniversal-comments.git
+   git clone https://github.com/joneslloyd/bluniversal-comments.git
    cd bluniversal-comments
    ```
 
@@ -109,7 +109,7 @@ We welcome contributions to Bluniversal Comments! To contribute:
 
 ## Support
 
-For further assistance, please open an issue in the [GitHub Issues](https://github.com/your-repo-name/issues) page.
+For further assistance, please open an issue in the [GitHub Issues](https://github.com/joneslloyd/bluniversal-comments/issues) page.
 
 ## Credits
 

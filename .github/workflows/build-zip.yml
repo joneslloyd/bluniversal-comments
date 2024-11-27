@@ -84,19 +84,6 @@ jobs:
           name: chrome-extension-zip
           path: ./chrome-extension.zip
 
-      # Create GitHub Release
-      - name: Create GitHub Release
-        id: create-release
-        if: github.ref == 'refs/heads/main'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.get-version.outputs.version }}
-          release_name: Chrome Extension Release ${{ steps.get-version.outputs.version }}
-          draft: false
-          prerelease: false
-
       # Get the version number
       - name: Get Version
         id: get-version
@@ -106,6 +93,19 @@ jobs:
           PATCH=$((github.run_number - 1))
           VERSION="${MAJOR}.${MINOR}.${PATCH}"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      # Create GitHub Release
+      - name: Create GitHub Release
+        id: create-release
+        if: github.ref == 'refs/heads/main'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.get-version.outputs.version }}
+          release_name: Chrome Extension Release v${{ steps.get-version.outputs.version }}
+          draft: false
+          prerelease: false
 
       # Upload ZIP to Release
       - name: Upload ZIP to Release
