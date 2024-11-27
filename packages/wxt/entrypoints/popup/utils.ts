@@ -1,19 +1,38 @@
-export async function searchForPost(tag: string): Promise<string | null> {
-  const response = await fetch(
-    `https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?q=%23${tag}&author=bluniversal.bsky.social&tag=${tag}&sort=top&limit=1`,
+const generateHmac = async (
+  secret: string,
+  payload: string,
+): Promise<string> => {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: { name: "SHA-256" } },
+    false,
+    ["sign"],
   );
-  if (!response.ok) {
-    throw new Error(`Failed to search for posts: ${response.statusText}`);
-  }
-  const data = await response.json();
-  return data.posts?.[0]?.uri || null;
-}
+
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    encoder.encode(payload),
+  );
+
+  return Array.from(new Uint8Array(signature))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+};
 
 export async function createNewPost(
   pageUrl: string,
   pageTitle: string,
 ): Promise<string> {
+  const sharedSecret = import.meta.env.WXT_BS_SHARED_SECRET;
+  const timestamp = Math.floor(Date.now() / 1000);
+  const payload = `${pageUrl}|${pageTitle}|${timestamp}`;
+  const hash = await generateHmac(sharedSecret, payload);
+
   const lambdaUrl = import.meta.env.WXT_LAMBDA_URL;
+
   const response = await fetch(lambdaUrl, {
     method: "POST",
     headers: {
@@ -22,11 +41,15 @@ export async function createNewPost(
     body: JSON.stringify({
       title: pageTitle,
       url: pageUrl,
+      timestamp,
+      hash,
     }),
   });
+
   if (!response.ok) {
     throw new Error(`Failed to create post: ${response.statusText}`);
   }
+
   return (await response.json()).uri;
 }
 
@@ -55,4 +78,4 @@ export async function refreshAccessToken(
     blueskyActive: data.active,
   });
   return data.accessJwt;
-};
+}

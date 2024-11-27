@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { createNewPost, searchForPost, refreshAccessToken } from "./utils";
+import { createNewPost } from "./utils";
+import { searchForPost } from "../../../functions/src/utils";
 import BskyComments from "./BskyComments";
 import "./App.css";
 import { generateTaggedUrl } from "@bluniversal-comments/core/utils";
@@ -15,6 +16,7 @@ const App: React.FC = () => {
   const [postUri, setPostUri] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [creatingPost, setCreatingPost] = useState<boolean>(false);
   const agentManager = new BlueskyAgentManager();
 
   useEffect(() => {
@@ -28,27 +30,34 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const initializePost = async () => {
-      if (!tabInfo) return;
-      agentManager.initialize();
-      const { url, title } = tabInfo;
+      if (!tabInfo || creatingPost) return;
+      setCreatingPost(true);
 
-      const normalizedUrl = normalizeUrl(url);
-      const hashedTag = await generateTaggedUrl(normalizedUrl);
+      try {
+        agentManager.initialize();
+        const { url, title } = tabInfo;
 
-       setStatusMessage("Searching for existing posts...");
-            let existingPostUri = await searchForPost(hashedTag);
-            if (!existingPostUri) {
-              setStatusMessage(
-                "No existing post found. Creating a new post...",
-              );
-              existingPostUri = await createNewPost(normalizedUrl, title);
-            }
-            setPostUri(existingPostUri);
-            setStatusMessage("");
+        const normalizedUrl = normalizeUrl(url);
+        const hashedTag = await generateTaggedUrl(normalizedUrl);
+
+        setStatusMessage("Searching for existing posts...");
+        let existingPostUri = await searchForPost(hashedTag);
+        if (!existingPostUri) {
+          setStatusMessage("No existing post found. Creating a new post...");
+          existingPostUri = await createNewPost(normalizedUrl, title);
+        }
+        setPostUri(existingPostUri);
+        setStatusMessage("");
+      } catch (error) {
+        console.error("Error during post initialization:", error);
+        setErrorMessage("Failed to initialize the post. Please try again.");
+      } finally {
+        setCreatingPost(false);
+      }
     };
 
     initializePost();
-  }, [tabInfo, postUri]);
+  }, [tabInfo]);
 
   return (
     <div style={{ padding: "10px", fontFamily: "Arial, sans-serif" }}>

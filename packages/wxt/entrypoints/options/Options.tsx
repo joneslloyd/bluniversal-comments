@@ -197,7 +197,11 @@ const Options: React.FC = () => {
         <p
           style={{
             marginTop: "20px",
-            color: statusMessage.includes("Error") || statusMessage.includes("No active") ? "red" : "green",
+            color:
+              statusMessage.includes("Error") ||
+              statusMessage.includes("No active")
+                ? "red"
+                : "green",
           }}
         >
           {statusMessage}

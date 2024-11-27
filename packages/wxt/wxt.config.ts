@@ -5,9 +5,10 @@ export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   manifest: {
     manifest_version: 3,
-    name: "Bluesky Comments Extension",
+    name: "Bluniversal Comments",
     version: "1.0",
-    description: "Displays a Bluesky comments feed for the current page.",
+    description:
+      "Universal comments with Bluesky! Displays a Bluesky comments feed for the current page.",
     permissions: ["activeTab", "storage"],
     host_permissions: [
       "https://bsky.social/*",

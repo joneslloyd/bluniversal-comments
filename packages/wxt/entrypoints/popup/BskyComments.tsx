@@ -2,22 +2,23 @@ import React, { useEffect, useState } from "react";
 import { AppBskyFeedDefs, AppBskyFeedPost } from "@atproto/api";
 import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
 import BskyReply from "./BskyReply";
-import "./BskyComments.css"
+import "./BskyComments.css";
 
 interface BskyCommentsProps {
   postUri: string;
 }
 
 const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
-  const [replies, setReplies] = useState<AppBskyFeedDefs.ThreadViewPost[] | null>(
-    null
-  );
+  const [replies, setReplies] = useState<
+    AppBskyFeedDefs.ThreadViewPost[] | null
+  >(null);
   const [error, setError] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState<number>(3);
   const [rootData, setRootData] = useState<{
     uri: string;
     cid: string;
   } | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   const agentManager = new BlueskyAgentManager();
 
@@ -30,16 +31,14 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
         const thread = response.data.thread;
 
         if (thread.replies) {
-          // Filter out the top-level post itself, leaving only replies
           const topLevelReplies = thread.replies.filter((reply) =>
-            AppBskyFeedDefs.isThreadViewPost(reply)
+            AppBskyFeedDefs.isThreadViewPost(reply),
           ) as AppBskyFeedDefs.ThreadViewPost[];
           setReplies(topLevelReplies);
         } else {
           setReplies([]);
         }
 
-        // Set root data for replies
         if (thread.post.cid) {
           setRootData({ uri: thread.post.uri, cid: thread.post.cid });
         }
@@ -54,28 +53,74 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
 
   useEffect(() => {
     const initialize = async () => {
-      await agentManager.initialize();
-      await fetchReplies();
+      try {
+        const isInitialized = await agentManager.initialize();
+        setIsLoggedIn(isInitialized);
+
+        if (isInitialized) {
+          await fetchReplies();
+        }
+      } catch {
+        setIsLoggedIn(false);
+      }
     };
 
     initialize();
 
-    const intervalId = setInterval(fetchReplies, 60000);
+    const intervalId = setInterval(() => {
+      if (isLoggedIn) {
+        fetchReplies();
+      }
+    }, 60000);
+
     return () => clearInterval(intervalId);
-  }, [postUri]);
+  }, [postUri, isLoggedIn]);
+
+  if (!isLoggedIn) {
+    return (
+      <div
+        style={{
+          fontFamily: "Arial, sans-serif",
+          padding: "10px",
+          textAlign: "center",
+        }}
+      >
+        <p style={{ color: "red", fontSize: "14px" }}>
+          You are not logged in. Please go to the options page to log in.
+        </p>
+        <button
+          style={{
+            marginTop: "10px",
+            padding: "10px",
+            backgroundColor: "#1a73e8",
+            color: "#fff",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+          onClick={() => chrome.runtime.openOptionsPage()}
+        >
+          Open Options Page
+        </button>
+      </div>
+    );
+  }
 
   const renderReply = (reply: AppBskyFeedDefs.ThreadViewPost) => {
     const { post } = reply;
     const record = post.record as AppBskyFeedPost.Record;
     const userLocale = navigator.language || "en-GB";
 
-    const formattedDate = new Date(record.createdAt).toLocaleString(userLocale, {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const formattedDate = new Date(record.createdAt).toLocaleString(
+      userLocale,
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      },
+    );
 
     return (
       <div
@@ -110,10 +155,14 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
             <strong style={{ fontSize: "14px" }}>
               {post.author.displayName || post.author.handle}
             </strong>
-            <small style={{ display: "block", color: "#666", fontSize: "12px" }}>
+            <small
+              style={{ display: "block", color: "#666", fontSize: "12px" }}
+            >
               @{post.author.handle}
             </small>
-            <small style={{ display: "block", color: "#666", fontSize: "12px" }}>
+            <small
+              style={{ display: "block", color: "#666", fontSize: "12px" }}
+            >
               {formattedDate}
             </small>
           </div>
@@ -157,7 +206,9 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
         <div>
           {replies.length > 0 ? (
             <>
-              {replies.slice(0, visibleCount).map((reply) => renderReply(reply))}
+              {replies
+                .slice(0, visibleCount)
+                .map((reply) => renderReply(reply))}
               {replies.length > visibleCount && (
                 <button
                   onClick={() => setVisibleCount((prev) => prev + 5)}

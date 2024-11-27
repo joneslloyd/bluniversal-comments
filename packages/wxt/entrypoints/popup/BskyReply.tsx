@@ -11,7 +11,11 @@ interface BskyReplyProps {
   onReplySuccess: () => Promise<void>;
 }
 
-const BskyReply: React.FC<BskyReplyProps> = ({ parentUri, rootData, onReplySuccess }) => {
+const BskyReply: React.FC<BskyReplyProps> = ({
+  parentUri,
+  rootData,
+  onReplySuccess,
+}) => {
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +62,10 @@ const BskyReply: React.FC<BskyReplyProps> = ({ parentUri, rootData, onReplySucce
   };
 
   return (
-    <div className="reply-container" style={{ marginTop: "10px", textAlign: "left" }}>
+    <div
+      className="reply-container"
+      style={{ marginTop: "10px", textAlign: "left" }}
+    >
       {isReplying ? (
         <div>
           <textarea
@@ -71,7 +78,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({ parentUri, rootData, onReplySucce
               marginBottom: "5px",
               border: "1px solid #ccc",
               borderRadius: "4px",
-              boxSizing: "border-box"
+              boxSizing: "border-box",
             }}
           />
           <div>

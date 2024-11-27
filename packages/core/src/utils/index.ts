@@ -55,7 +55,7 @@ export class BlueskyAgentManager {
     this.agent = new BskyAgent({ service: "https://bsky.social" });
   }
 
-  async initialize(): Promise<void> {
+  async initialize(): Promise<boolean> {
     const session = await this.getSessionFromStorage();
     if (session) {
       await this.agent.resumeSession({
@@ -65,7 +65,9 @@ export class BlueskyAgentManager {
         did: session.blueskyDid,
         active: session.blueskyActive,
       });
+      return true;
     }
+    return false;
   }
 
   async getAgent(): Promise<BskyAgent> {
