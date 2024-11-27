@@ -77,16 +77,6 @@ jobs:
       - name: Check Root Directory Before Upload
         run: ls -l ./ || echo "No files found in the root directory"
 
-      # Set the release version
-      - name: Set Release Version
-        if: github.ref == 'refs/heads/main'
-        run: |
-          MAJOR=0
-          MINOR=0
-          PATCH=$((github.run_number - 1))
-          RELEASE_VERSION="${MAJOR}.${MINOR}.${PATCH}"
-          echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_OUTPUT
-
       # Upload the ZIP file as a GitHub Release Artifact
       - name: Upload ZIP as Artifact
         uses: actions/upload-artifact@v3
@@ -102,10 +92,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ env.RELEASE_VERSION }}
-          release_name: Chrome Extension Release v${{ env.RELEASE_VERSION }}
+          tag_name: ${{ steps.get-version.outputs.version }}
+          release_name: Chrome Extension Release ${{ steps.get-version.outputs.version }}
           draft: false
           prerelease: false
+
+      # Get the version number
+      - name: Get Version
+        id: get-version
+        run: |
+          MAJOR=0
+          MINOR=0
+          PATCH=$((github.run_number - 1))
+          VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       # Upload ZIP to Release
       - name: Upload ZIP to Release
