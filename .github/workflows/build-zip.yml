@@ -69,3 +69,26 @@ jobs:
         with:
           name: chrome-extension-zip
           path: ./*.zip
+
+    # Create GitHub Release
+      - name: Create GitHub Release
+        id: create-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.BS_GH }}
+        with:
+          tag_name: v0.0.1
+          release_name: Chrome Extension Release
+          draft: false
+          prerelease: false
+
+      # Upload ZIP to Release
+      - name: Upload ZIP to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.BS_GH }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./chrome-extension.zip
+          asset_name: chrome-extension.zip
+          asset_content_type: application/zip
