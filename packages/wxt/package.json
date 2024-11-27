@@ -15,6 +15,7 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.11.9",
     "@atproto/api": "^0.13.18",
     "@bluniversal-comments/core": "workspace:*",
     "react": "^18.3.1",
