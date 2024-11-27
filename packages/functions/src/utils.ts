@@ -4,7 +4,7 @@ import { generateTaggedUrl } from "@bluniversal-comments/core/utils";
 export const searchForPost = async (tag: string): Promise<string | null> => {
   const agent = new BskyAgent({ service: "https://public.api.bsky.app" });
   const response = await agent.app.bsky.feed.searchPosts({
-    q: `%23${tag}`,
+    q: `#${tag}`,
     tag: [tag],
     author: "bluniversal.bsky.social",
     limit: 1,
