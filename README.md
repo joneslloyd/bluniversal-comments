@@ -9,7 +9,7 @@ Bluniversal Comments is a Chrome Extension enabling "universal comments" via Blu
 ### Step 1: Download the Extension
 
 1. Visit the **[Releases](https://github.com/joneslloyd/bluniversal-comments/releases)** page on the GitHub repository.
-2. Download the latest `.zip` file for the extension.
+2. Download the latest `chrome-extension.zip` file for the extension.
 
 ### Step 2: Install the Extension
 
