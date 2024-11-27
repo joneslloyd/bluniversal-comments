@@ -3,6 +3,7 @@ import { createNewPost, searchForPost, refreshAccessToken } from "./utils";
 import BskyComments from "./BskyComments";
 import "./App.css";
 import { generateTaggedUrl } from "@bluniversal-comments/core/utils";
+import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
 
 interface TabInfo {
   url: string;
@@ -14,6 +15,7 @@ const App: React.FC = () => {
   const [postUri, setPostUri] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const agentManager = new BlueskyAgentManager();
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
@@ -27,27 +29,13 @@ const App: React.FC = () => {
   useEffect(() => {
     const initializePost = async () => {
       if (!tabInfo) return;
+      agentManager.initialize();
       const { url, title } = tabInfo;
 
       const normalizedUrl = normalizeUrl(url);
       const hashedTag = await generateTaggedUrl(normalizedUrl);
 
-      chrome.storage.sync.get(
-        ["blueskyAccessJwt", "blueskyRefreshJwt", "blueskyDid"],
-        async ({
-          blueskyAccessJwt: accessToken,
-          blueskyRefreshJwt: refreshToken,
-          blueskyDid: did,
-        }) => {
-          if (!accessToken || !did) {
-            setErrorMessage(
-              "Please log in to Bluesky via the extension options.",
-            );
-            return;
-          }
-
-          try {
-            setStatusMessage("Searching for existing posts...");
+       setStatusMessage("Searching for existing posts...");
             let existingPostUri = await searchForPost(hashedTag);
             if (!existingPostUri) {
               setStatusMessage(
@@ -57,31 +45,10 @@ const App: React.FC = () => {
             }
             setPostUri(existingPostUri);
             setStatusMessage("");
-          } catch (error: any) {
-            if (error.message.includes("ExpiredToken")) {
-              try {
-                const newAccessToken = await refreshAccessToken(refreshToken);
-                const newPostUri = await createNewPost(normalizedUrl, title);
-                setPostUri(newPostUri);
-                setStatusMessage("Session refreshed. Loading comments...");
-              } catch {
-                setErrorMessage("Session expired. Please log in again.");
-                chrome.storage.sync.remove([
-                  "blueskyAccessJwt",
-                  "blueskyRefreshJwt",
-                  "blueskyDid",
-                ]);
-              }
-            } else {
-              setErrorMessage(`Error: ${error.message}`);
-            }
-          }
-        },
-      );
     };
 
     initializePost();
-  }, [tabInfo]);
+  }, [tabInfo, postUri]);
 
   return (
     <div style={{ padding: "10px", fontFamily: "Arial, sans-serif" }}>

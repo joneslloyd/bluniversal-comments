@@ -1,109 +1,203 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
 
 const Options: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [sessionValid, setSessionValid] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [editing, setEditing] = useState(false);
+
+  const agentManager = new BlueskyAgentManager();
+
+  const checkSessionStatus = async () => {
+    setLoading(true);
+    setStatusMessage(null);
+
+    try {
+      const agent = await agentManager.getAgent();
+      if (agent.session?.accessJwt) {
+        setSessionValid(true);
+        setUsername(agent.session.handle || "");
+        setStatusMessage("Active session verified.");
+      } else {
+        setSessionValid(false);
+        setStatusMessage("No active session found. Please log in.");
+      }
+    } catch (error) {
+      console.error("Error verifying session:", error);
+      setSessionValid(false);
+      setStatusMessage("Failed to verify session. Please log in.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    checkSessionStatus();
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatusMessage("Logging in...");
+    setLoading(true);
 
     try {
-      // Send the login request to Bluesky
-      const response = await fetch(
-        "https://bsky.social/xrpc/com.atproto.server.createSession",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            identifier: username.trim(),
-            password: password.trim(),
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Invalid username or app password");
-      }
-
-      // Save credentials to Chrome's storage
-      const data = await response.json();
-      chrome.storage.sync.set(
-        {
-          blueskyAccessJwt: data.accessJwt,
-          blueskyRefreshJwt: data.refreshJwt,
-          blueskyDid: data.did,
-          blueskyHandle: data.handle,
-        },
-        () => {
-          setStatusMessage("Logged in successfully!");
-        },
-      );
+      await agentManager.logout();
+      await agentManager.login(username, password);
+      setSessionValid(true);
+      setStatusMessage("Logged in successfully!");
+      setEditing(false);
     } catch (error: any) {
+      setSessionValid(false);
       setStatusMessage(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
-  console.log("🍍");
+
+  const handleEdit = () => {
+    setEditing(true);
+    setUsername("");
+    setPassword("");
+    setSessionValid(null);
+  };
+
   return (
     <div style={{ fontFamily: "Arial, sans-serif", padding: "20px" }}>
-      <h1>Bluesky Login</h1>
-      <form onSubmit={handleLogin}>
-        <label htmlFor="username">Bluesky Username:</label>
-        <input
-          type="text"
-          id="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "8px",
-            marginTop: "5px",
-            marginBottom: "15px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-          }}
-          required
-        />
-        <label htmlFor="password">App Password:</label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "8px",
-            marginTop: "5px",
-            marginBottom: "15px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-          }}
-          required
-        />
-        <button
-          type="submit"
-          style={{
-            width: "100%",
-            padding: "10px",
-            backgroundColor: "#1a73e8",
-            color: "#fff",
-            border: "none",
-            borderRadius: "4px",
-            fontSize: "16px",
-            cursor: "pointer",
-          }}
-        >
-          Login
-        </button>
-      </form>
-      {statusMessage && (
+      <h1>Bluniversal Comments – Log in to Bluesky</h1>
+
+      {loading ? (
+        <p>Loading...</p>
+      ) : sessionValid ? (
+        !editing ? (
+          <div>
+            <p>
+              Authenticated as <strong>{username}</strong>.
+            </p>
+            <button
+              onClick={handleEdit}
+              style={{
+                padding: "10px",
+                backgroundColor: "#1a73e8",
+                color: "#fff",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Edit Credentials
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleLogin}>
+            <label htmlFor="username">Bluesky Username:</label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value.trim())}
+              style={{
+                width: "100%",
+                padding: "8px",
+                marginTop: "5px",
+                marginBottom: "15px",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+              }}
+              required
+            />
+            <label htmlFor="password">App Password:</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value.trim())}
+              style={{
+                width: "100%",
+                padding: "8px",
+                marginTop: "5px",
+                marginBottom: "15px",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+              }}
+              required
+            />
+            <button
+              type="submit"
+              style={{
+                width: "100%",
+                padding: "10px",
+                backgroundColor: "#1a73e8",
+                color: "#fff",
+                border: "none",
+                borderRadius: "4px",
+                fontSize: "16px",
+                cursor: "pointer",
+              }}
+            >
+              Login
+            </button>
+          </form>
+        )
+      ) : (
+        <form onSubmit={handleLogin}>
+          <label htmlFor="username">Bluesky Username:</label>
+          <input
+            type="text"
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value.trim())}
+            style={{
+              width: "100%",
+              padding: "8px",
+              marginTop: "5px",
+              marginBottom: "15px",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+            }}
+            required
+          />
+          <label htmlFor="password">App Password:</label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value.trim())}
+            style={{
+              width: "100%",
+              padding: "8px",
+              marginTop: "5px",
+              marginBottom: "15px",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+            }}
+            required
+          />
+          <button
+            type="submit"
+            style={{
+              width: "100%",
+              padding: "10px",
+              backgroundColor: "#1a73e8",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              fontSize: "16px",
+              cursor: "pointer",
+            }}
+          >
+            Login
+          </button>
+        </form>
+      )}
+
+      {statusMessage && !loading && (
         <p
           style={{
             marginTop: "20px",
-            color: statusMessage.includes("Error") ? "red" : "green",
+            color: statusMessage.includes("Error") || statusMessage.includes("No active") ? "red" : "green",
           }}
         >
           {statusMessage}

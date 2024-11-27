@@ -7,11 +7,15 @@
   "exports": {
     "./*": [
       "./src/*/index.ts",
-      "./src/*.ts"
+      "./src/*.ts",
+      "./src/utils/*/index.ts",
+      "./src/utils/*.ts"
     ]
   },
   "dependencies": {
-    "sst": "*"
+    "sst": "*",
+    "@atproto/api": "^0.13.18",
+    "@types/chrome": "^0.0.280"
   },
   "devDependencies": {
     "vitest": "^2.0.3"

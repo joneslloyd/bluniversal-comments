@@ -24,7 +24,6 @@ export async function createNewPost(
       url: pageUrl,
     }),
   });
-  console.log({ response });
   if (!response.ok) {
     throw new Error(`Failed to create post: ${response.statusText}`);
   }
@@ -53,45 +52,7 @@ export async function refreshAccessToken(
     blueskyRefreshJwt: data.refreshJwt,
     blueskyDid: data.did,
     blueskyHandle: data.handle,
+    blueskyActive: data.active,
   });
   return data.accessJwt;
-}
-
-export async function fetchThread(
-  postUri: string,
-  accessToken: string | null = null,
-): Promise<any> {
-  if (!accessToken) {
-    accessToken = await new Promise<string>((resolve) => {
-      chrome.storage.sync.get(["blueskyAccessJwt"], (items) => {
-        resolve(items.blueskyAccessJwt);
-      });
-    });
-  }
-
-  const response = await fetch(
-    `https://bsky.social/xrpc/app.bsky.feed.getPostThread?uri=${encodeURIComponent(postUri)}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        Accept: "application/json",
-      },
-    },
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    if (errorText.includes("ExpiredToken")) {
-      throw new Error("ExpiredToken");
-    }
-    throw new Error(`Failed to fetch thread: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  if (!data.thread) {
-    throw new Error("No thread data found");
-  }
-
-  return data.thread;
-}
+};
