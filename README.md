@@ -1,5 +1,7 @@
 # Bluniversal Comments
 
+![bluniversal-comments](https://github.com/user-attachments/assets/68542d61-7317-4d71-802e-95a6052bc466)
+
 Bluniversal Comments is a Chrome Extension enabling "universal comments" via Bluesky, directly on web pages. With this extension, you can view, comment, and engage with Bluesky discussions linked to any web page.
 
 ---
