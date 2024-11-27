@@ -3,11 +3,11 @@ name: Build Chrome Extension ZIP
 on:
   push:
     branches:
-      - main  # Trigger on pushes to the `main` branch
-  workflow_dispatch:  # Allow manual runs
+      - main
+  workflow_dispatch:
 
 permissions:
-  contents: write  # Allow GITHUB_TOKEN to create releases and upload assets
+  contents: write
 
 jobs:
   build:
@@ -62,16 +62,19 @@ jobs:
         working-directory: ./packages/wxt
         run: pnpm wxt zip
 
-      # Debugging: List files in the output folder
-      - name: List Files in Output Folder
-        run: ls -l ./packages/wxt/.output || echo "No files found in the output folder"
+      # Debugging: Check if ZIP file is generated
+      - name: Check Output Directory
+        run: ls -l ./packages/wxt/.output || echo "No files found in the output directory"
 
       # Move the ZIP file to the root directory
       - name: Move ZIP to Root
-        run: mv ./packages/wxt/.output/*.zip ./ || echo "No ZIP file found to move"
+        run: |
+          for file in ./packages/wxt/.output/*.zip; do
+            mv "$file" ./chrome-extension.zip && echo "Moved $file to ./chrome-extension.zip";
+          done || echo "No ZIP file found to move"
 
       # Debugging: List files in the root directory
-      - name: List Files in Root
+      - name: Check Root Directory Before Upload
         run: ls -l ./ || echo "No files found in the root directory"
 
       # Upload the ZIP file as a GitHub Release Artifact
@@ -79,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: chrome-extension-zip
-          path: ./*.zip
+          path: ./chrome-extension.zip
 
       # Create GitHub Release
       - name: Create GitHub Release
@@ -89,7 +92,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v0.0.2
+          tag_name: v0.0.1
           release_name: Chrome Extension Release
           draft: false
           prerelease: false
