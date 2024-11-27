@@ -73,6 +73,7 @@ jobs:
       # Create GitHub Release
       - name: Create GitHub Release
         id: create-release
+        if: github.ref == 'refs/heads/main'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -84,6 +85,7 @@ jobs:
 
       # Upload ZIP to Release
       - name: Upload ZIP to Release
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
