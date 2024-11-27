@@ -1,0 +1,58 @@
+name: Build Chrome Extension ZIP
+
+on:
+  push:
+    branches:
+      - main  # Trigger on pushes to the `main` branch
+  workflow_dispatch:  # Allow manual runs
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repo
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Adjust to match your project
+
+      # Install dependencies
+      - name: Install Dependencies
+        run: pnpm install
+
+      # Export environment variables from root `.env`
+      - name: Export Root .env
+        if: ${{ env }}
+        run: |
+          if [ -f .env ]; then
+            export $(cat .env | grep -v '^#' | xargs)
+          fi
+
+      # Export environment variables from `./packages/wxt/.env`
+      - name: Export ./packages/wxt/.env
+        if: ${{ env }}
+        run: |
+          if [ -f ./packages/wxt/.env ]; then
+            export $(cat ./packages/wxt/.env | grep -v '^#' | xargs)
+          fi
+
+      # Run the build command from ./packages/wxt/
+      - name: Build ZIP
+        working-directory: ./packages/wxt
+        run: pnpm wxt zip
+
+      # Move the ZIP file to the root directory
+      - name: Move ZIP to Root
+        run: mv ./packages/wxt/.output/*.zip ./
+
+      # Upload the ZIP file as a GitHub Release Artifact
+      - name: Upload ZIP as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: chrome-extension-zip
+          path: ./*.zip
