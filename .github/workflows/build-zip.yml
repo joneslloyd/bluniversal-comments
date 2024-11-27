@@ -21,6 +21,10 @@ jobs:
         with:
           node-version: '16'  # Adjust to match your project
 
+      # Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       # Install dependencies
       - name: Install Dependencies
         run: pnpm install
