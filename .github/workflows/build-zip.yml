@@ -15,11 +15,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Set up Node.js (update to a compatible version)
+      # Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.12.0'  # Use a version compatible with the latest pnpm
+          node-version: '18.12.0'
 
       # Install pnpm
       - name: Install pnpm
@@ -34,9 +34,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      # Install dependencies
+      # Install dependencies with --prefer-frozen-lockfile
       - name: Install Dependencies
-        run: pnpm install
+        run: pnpm install --prefer-frozen-lockfile
 
       # Load environment variables from root .env
       - name: Load Root .env
@@ -62,10 +62,6 @@ jobs:
       # Move the ZIP file to the root directory
       - name: Move ZIP to Root
         run: mv ./packages/wxt/.output/*.zip ./
-
-      # List files in the root for debugging
-      - name: List Files in Root
-        run: ls -l ./
 
       # Upload the ZIP file as a GitHub Release Artifact
       - name: Upload ZIP as Artifact
