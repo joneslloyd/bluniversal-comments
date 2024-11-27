@@ -68,6 +68,25 @@ export async function refreshAccessToken(
   return data.accessJwt;
 }
 
+export const getBrowserType = (): string => {
+  const userAgent = navigator.userAgent;
+  let browserType = "Unknown";
+
+  if (userAgent.includes("Chrome")) {
+    browserType = "Chrome";
+  } else if (userAgent.includes("Firefox")) {
+    browserType = "Firefox";
+  } else if (userAgent.includes("Safari")) {
+    browserType = "Safari";
+  } else if (userAgent.includes("Edge")) {
+    browserType = "Edge";
+  } else if (userAgent.includes("Opera")) {
+    browserType = "Opera";
+  }
+
+  return browserType;
+};
+
 export const maybeInitializeDevModeAgent = async (
   agentManager: BlueskyAgentManager,
 ) => {
