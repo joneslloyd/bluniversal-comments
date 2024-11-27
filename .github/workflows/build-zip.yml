@@ -15,11 +15,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Set up Node.js
+      # Set up Node.js (update to a compatible version)
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # Adjust to match your project
+          node-version: '18.12.0'  # Use a version compatible with the latest pnpm
 
       # Install pnpm
       - name: Install pnpm
@@ -31,7 +31,6 @@ jobs:
 
       # Export environment variables from root `.env`
       - name: Export Root .env
-        if: ${{ env }}
         run: |
           if [ -f .env ]; then
             export $(cat .env | grep -v '^#' | xargs)
@@ -39,7 +38,6 @@ jobs:
 
       # Export environment variables from `./packages/wxt/.env`
       - name: Export ./packages/wxt/.env
-        if: ${{ env }}
         run: |
           if [ -f ./packages/wxt/.env ]; then
             export $(cat ./packages/wxt/.env | grep -v '^#' | xargs)
