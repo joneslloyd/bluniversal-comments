@@ -90,8 +90,8 @@ jobs:
         run: |
           MAJOR=0
           MINOR=0
-          PATCH=$((github.run_number))
-          VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          PATCH=$(printf "%03d" $((github.run_number)))
+          VERSION="v${MAJOR}.${MINOR}.${PATCH}"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       # Create GitHub Release
@@ -102,8 +102,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.get-version.outputs.version }}
-          release_name: Chrome Extension Release v${{ steps.get-version.outputs.version }}
+          tag_name: ${{ steps.get-version.outputs.version }}
+          release_name: Chrome Extension Release ${{ steps.get-version.outputs.version }}
           draft: false
           prerelease: false
 
