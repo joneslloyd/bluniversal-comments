@@ -92,8 +92,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v0.0.1
-          release_name: Chrome Extension Release
+          tag_name: v${{ github.run_number }}
+          release_name: Bluniversal Comments – Chrome Extension Release v${{ github.run_number }}
           draft: false
           prerelease: false
 

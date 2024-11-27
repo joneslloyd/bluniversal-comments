@@ -68,7 +68,9 @@ export async function refreshAccessToken(
   return data.accessJwt;
 }
 
-export const maybeInitializeDevModeAgent = async (agentManager: BlueskyAgentManager) => {
+export const maybeInitializeDevModeAgent = async (
+  agentManager: BlueskyAgentManager,
+) => {
   const devUsername = import.meta.env.WXT_BS_DEV_USERNAME;
   const devPassword = import.meta.env.WXT_BS_DEV_PASSWORD;
 
