@@ -1,6 +1,6 @@
 {
-  "name": "wxt-react-starter",
-  "description": "manifest.json description",
+  "name": "bluniversal-comments",
+  "description": "Universal Comments with Bluesky",
   "private": true,
   "version": "0.0.0",
   "type": "module",
