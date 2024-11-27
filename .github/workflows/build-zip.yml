@@ -90,7 +90,7 @@ jobs:
         run: |
           MAJOR=0
           MINOR=0
-          PATCH=$((github.run_number - 1))
+          PATCH=$((github.run_number))
           VERSION="${MAJOR}.${MINOR}.${PATCH}"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
