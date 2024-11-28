@@ -50,11 +50,11 @@ jobs:
           fi
 
       # Load environment variables from ./packages/wxt/.env
-      - name: Load ./packages/wxt/.env
+      - name: Load ./packages/wxt/.env.production
         run: |
-          if [ -f ./packages/wxt/.env ]; then
-            echo "Loading ./packages/wxt/.env file..."
-            cat ./packages/wxt/.env | grep -v '^#' >> $GITHUB_ENV
+          if [ -f ./packages/wxt/.env.production ]; then
+            echo "Loading ./packages/wxt/.env.production file..."
+            cat ./packages/wxt/.env.production | grep -v '^#' >> $GITHUB_ENV
           fi
 
       # Run the build command from ./packages/wxt/

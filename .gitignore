@@ -7,7 +7,7 @@ node_modules
 # tmp files
 .#*
 
-# env 
+# env
 .env*.local
 .env
 
