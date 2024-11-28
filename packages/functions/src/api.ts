@@ -28,6 +28,17 @@ const isPayload = (data: any): data is PostCreatorProps => {
 };
 
 export const handler: Handler = async (event) => {
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      },
+    };
+  }
+
   const username = process.env.username;
   const password = process.env.password;
 
@@ -97,6 +108,7 @@ export const handler: Handler = async (event) => {
     }
 
     const recordPayload = await formRecordPayload(url, title);
+
     const { uri } = await botAgent.post({
       ...recordPayload,
       createdAt: new Date().toISOString(),
@@ -105,11 +117,6 @@ export const handler: Handler = async (event) => {
     return {
       statusCode: 200,
       body: JSON.stringify({ uri }),
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-      },
     };
   } catch (error: any) {
     console.error("Error in Lambda function:", error);
