@@ -57,32 +57,48 @@ jobs:
             cat ./packages/wxt/.env.production | grep -v '^#' >> $GITHUB_ENV
           fi
 
-      # Run the build command from ./packages/wxt/
-      - name: Build ZIP
+      # Run the Chrome build command from ./packages/wxt/
+      - name: Build Chrome ZIP
         working-directory: ./packages/wxt
         run: pnpm wxt zip
 
-      # Debugging: Check if ZIP file is generated
-      - name: Check Output Directory
-        run: ls -l ./packages/wxt/.output || echo "No files found in the output directory"
+      # Run the Firefox build command from ./packages/wxt/
+      - name: Build Firefox ZIP
+        working-directory: ./packages/wxt
+        run: pnpm wxt zip:firefox
 
-      # Move the ZIP file to the root directory
-      - name: Move ZIP to Root
+      # Debugging: Check if ZIP files are generated
+      - name: Check Output Directory
+        run: ls -l ./packages/wxt/.output/*.zip || echo "No ZIP files found in the output directory"
+
+      # Debugging: List ZIP files in the output directory
+      - name: List ZIP Files
+        run: ls -l ./packages/wxt/.output/*.zip || echo "No ZIP files found to list"
+
+      # Move the ZIP files to the root directory without renaming
+      - name: Move ZIP Files to Root
         run: |
-          for file in ./packages/wxt/.output/*.zip; do
-            mv "$file" ./chrome-extension.zip && echo "Moved $file to ./chrome-extension.zip";
-          done || echo "No ZIP file found to move"
+          mv ./packages/wxt/.output/bluniversal-comments-chrome.zip ./bluniversal-comments-chrome.zip
+          mv ./packages/wxt/.output/bluniversal-comments-firefox.zip ./bluniversal-comments-firefox.zip
+          echo "Moved ZIP files to the root directory"
 
       # Debugging: List files in the root directory
       - name: Check Root Directory Before Upload
         run: ls -l ./ || echo "No files found in the root directory"
 
-      # Upload the ZIP file as a GitHub Release Artifact
-      - name: Upload ZIP as Artifact
+      # Upload the Chrome ZIP file as a GitHub Release Artifact
+      - name: Upload Chrome ZIP as Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: chrome-extension-zip
-          path: ./chrome-extension.zip
+          name: bluniversal-comments-chrome
+          path: ./packages/wxt/.output/bluniversal-comments-chrome.zip
+
+      # Upload the Firefox ZIP file as a GitHub Release Artifact
+      - name: Upload Firefox ZIP as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: bluniversal-comments-firefox
+          path: ./packages/wxt/.output/bluniversal-comments-firefox.zip
 
       # Get the version number
       - name: Get Version
@@ -107,14 +123,26 @@ jobs:
           draft: false
           prerelease: false
 
-      # Upload ZIP to Release
-      - name: Upload ZIP to Release
+      # Upload Chrome ZIP to Release
+      - name: Upload ZIPs to Release
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./chrome-extension.zip
-          asset_name: chrome-extension.zip
+          asset_path: ./packages/wxt/.output/bluniversal-comments-chrome.zip
+          asset_name: bluniversal-comments-chrome.zip
+          asset_content_type: application/zip
+
+      # Upload Firefox ZIP to Release
+      - name: Upload Firefox ZIP to Release
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./packages/wxt/.output/bluniversal-comments-firefox.zip
+          asset_name: bluniversal-comments-firefox.zip
           asset_content_type: application/zip

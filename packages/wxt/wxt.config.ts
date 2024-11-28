@@ -19,4 +19,7 @@ export default defineConfig({
       "https://public.api.bsky.app/*",
     ],
   },
+  zip: {
+    artifactTemplate: "{{name}}-{{browser}}.zip"
+  }
 });
