@@ -70,7 +70,6 @@ const App: React.FC = () => {
             console.error("Failed to retrieve session data from storage.");
             setErrorMessage("Failed to initialize the post. Please try again.");
           }
-          setPostUri(existingPostUri);
         }
         setPostUri(existingPostUri);
         setStatusMessage("");
