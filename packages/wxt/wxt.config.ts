@@ -33,7 +33,9 @@ export default defineConfig({
           "https://public.api.bsky.app/*",
         ],
     content_security_policy: {
-      extension_pages: isDevelopment ? "script-src 'self' 'unsafe-eval' 'unsafe-inline' http://localhost:*; object-src 'self'; connect-src ws://localhost:*;" : "script-src 'self'; object-src 'self';",
+      extension_pages: isDevelopment
+        ? "script-src 'self' 'unsafe-eval' 'unsafe-inline' http://localhost:*; object-src 'self'; connect-src ws://localhost:*;"
+        : "script-src 'self'; object-src 'self';",
     },
   },
   zip: {
