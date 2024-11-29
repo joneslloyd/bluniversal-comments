@@ -60,12 +60,12 @@ jobs:
       # Run the Chrome build command from ./packages/wxt/
       - name: Build Chrome ZIP
         working-directory: ./packages/wxt
-        run: pnpm wxt zip
+        run: pnpm zip
 
       # Run the Firefox build command from ./packages/wxt/
       - name: Build Firefox ZIP
         working-directory: ./packages/wxt
-        run: pnpm wxt zip:firefox
+        run: pnpm zip:firefox
 
       # Debugging: Check if ZIP files are generated
       - name: Check Output Directory
