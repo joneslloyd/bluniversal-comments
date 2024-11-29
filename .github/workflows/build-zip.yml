@@ -131,7 +131,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./packages/wxt/.output/bluniversal-comments-chrome.zip
+          asset_path: ./bluniversal-comments-chrome.zip
           asset_name: bluniversal-comments-chrome.zip
           asset_content_type: application/zip
 
@@ -143,6 +143,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./packages/wxt/.output/bluniversal-comments-firefox.zip
+          asset_path: ./bluniversal-comments-firefox.zip
           asset_name: bluniversal-comments-firefox.zip
           asset_content_type: application/zip
