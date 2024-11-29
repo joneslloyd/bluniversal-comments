@@ -91,14 +91,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: bluniversal-comments-chrome
-          path: ./packages/wxt/.output/bluniversal-comments-chrome.zip
+          path: ./bluniversal-comments-chrome.zip
 
       # Upload the Firefox ZIP file as a GitHub Release Artifact
       - name: Upload Firefox ZIP as Artifact
         uses: actions/upload-artifact@v3
         with:
           name: bluniversal-comments-firefox
-          path: ./packages/wxt/.output/bluniversal-comments-firefox.zip
+          path: ./bluniversal-comments-firefox.zip
 
       # Get the version number
       - name: Get Version
