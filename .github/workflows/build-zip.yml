@@ -1,4 +1,4 @@
-name: Build Chrome Extension ZIP
+name: Build Browser Extension ZIP
 
 on:
   push:
@@ -132,7 +132,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.get-version.outputs.version }}
-          release_name: Chrome Extension Release ${{ steps.get-version.outputs.version }}
+          release_name: Browser Extension Release ${{ steps.get-version.outputs.version }}
           draft: false
           prerelease: false
 
