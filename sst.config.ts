@@ -14,7 +14,7 @@ export default $config({
   async run() {
     const api = await import("./infra/api");
     api.bsPoster.url.apply((url) => {
-      updateEnvFile(pathResolve("./packages/wxt/.env"), url);
+      updateEnvFile(pathResolve("./packages/wxt/.env.production"), url);
     });
     await import("./infra/extension");
 

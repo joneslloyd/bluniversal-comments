@@ -36,7 +36,7 @@ export const updateEnvFile = (envFilePath: string, apiUrl: string) => {
 
     console.log(`.env file updated successfully with WXT_LAMBDA_URL=${apiUrl}`);
   } catch (error) {
-    console.error("Error updating .env file:", error);
+    console.error(`Error updating file at ${envFilePath}:`, error);
   }
 };
 
