@@ -11,9 +11,19 @@ Bluniversal Comments is a Chrome Extension enabling "universal comments" via Blu
 ### Step 1: Download the Extension
 
 1. Visit the **[Releases](https://github.com/joneslloyd/bluniversal-comments/releases)** page on the GitHub repository.
-2. Download the latest `chrome-extension.zip` file for the extension.
+
+2. **Chrome:**
+   Download the latest `chrome-extension.zip` file for the extension.
+
+**Firefox:**
+Download the latest `firefox-extension.zip` file for the extension.
+
+**Edge:**
+Download the latest `edge-extension.zip` file for the extension.
 
 ### Step 2: Install the Extension
+
+**Chrome and Edge**
 
 1. Unpackage the `.zip` file to a directory on your computer.
 2. Open Chrome and navigate to `chrome://extensions/`.
@@ -21,12 +31,26 @@ Bluniversal Comments is a Chrome Extension enabling "universal comments" via Blu
 4. Click the **Load unpacked** button.
 5. Select the directory where you unpackaged the `.zip` file.
 
+**Firefox**
+
+1. Download the `.zip` file to a directory on your computer, but don't unpackage it.
+2. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`.
+3. Click the **Load Temporary Add-On** button.
+4. Select the directory containing the `.zip` file.
+
 ### Step 3: Use the Extension
 
 1. Open any supported webpage.
 2. Click the Bluniversal Comments extension icon in the browser toolbar.
-3. Log in to your Bluesky account using your username and app password via the **Options** page (accessible by right-clicking on the extension icon and then Options).
-4. Once logged in, interact with existing Bluesky discussions or start a new thread for the page you're viewing.
+3. Log in to your Bluesky account using your username and app password – A new tab should open automatically, but if not:
+
+**Chrome and Edge:**
+Navigate to the **Options** page (accessible by right-clicking on the extension icon and then Options).
+
+**Firefox:**
+In the Temporary Extension page, click the three dots (...) icon next to the Bluniversal Comments Extension, and then click Preferences.
+
+4. Once logged in, go to any web page and interact with existing Bluesky discussions or start a new thread for the page you're viewing.
 
 ---
 

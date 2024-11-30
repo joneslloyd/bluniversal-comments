@@ -67,6 +67,11 @@ jobs:
         working-directory: ./packages/wxt
         run: pnpm zip:firefox
 
+      # Run the Edge build command from ./packages/wxt/
+      - name: Build Edge ZIP
+        working-directory: ./packages/wxt
+        run: pnpm zip:edge
+
       # Debugging: Check if ZIP files are generated
       - name: Check Output Directory
         run: ls -l ./packages/wxt/.output/*.zip || echo "No ZIP files found in the output directory"
@@ -80,6 +85,7 @@ jobs:
         run: |
           mv ./packages/wxt/.output/bluniversal-comments-chrome.zip ./bluniversal-comments-chrome.zip
           mv ./packages/wxt/.output/bluniversal-comments-firefox.zip ./bluniversal-comments-firefox.zip
+          mv ./packages/wxt/.output/bluniversal-comments-edge.zip ./bluniversal-comments-edge.zip
           echo "Moved ZIP files to the root directory"
 
       # Debugging: List files in the root directory
@@ -99,6 +105,13 @@ jobs:
         with:
           name: bluniversal-comments-firefox
           path: ./bluniversal-comments-firefox.zip
+
+      # Upload the Firefox ZIP file as a GitHub Release Artifact
+      - name: Upload Edge ZIP as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: bluniversal-comments-edge
+          path: ./bluniversal-comments-edge.zip
 
       # Get the version number
       - name: Get Version
@@ -145,4 +158,16 @@ jobs:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./bluniversal-comments-firefox.zip
           asset_name: bluniversal-comments-firefox.zip
+          asset_content_type: application/zip
+
+      # Upload Edge ZIP to Release
+      - name: Upload Edge ZIP to Release
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./bluniversal-comments-edge.zip
+          asset_name: bluniversal-comments-edge.zip
           asset_content_type: application/zip
