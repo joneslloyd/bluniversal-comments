@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "@bluniversal-comments/core": "workspace:*",
-    "sst": "*"
+    "sst": "3.3.37"
   },
   "scripts": {
     "shell": "sst shell tsx"

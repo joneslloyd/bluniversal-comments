@@ -16,7 +16,7 @@
     "@atproto/api": "^0.13.18",
     "@types/chrome": "^0.0.280",
     "@wxt-dev/storage": "^1.0.1",
-    "sst": "*"
+    "sst": "3.3.37"
   },
   "devDependencies": {
     "vitest": "^2.0.3"

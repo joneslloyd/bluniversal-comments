@@ -4,7 +4,7 @@
   "dependencies": {
     "@atproto/api": "^0.13.18",
     "@bluniversal-comments/core": "workspace:*",
-    "sst": "*"
+    "sst": "3.3.37"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.137"

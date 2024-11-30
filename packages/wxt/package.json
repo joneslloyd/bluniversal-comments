@@ -20,7 +20,7 @@
     "@bluniversal-comments/core": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "sst": "*"
+    "sst": "3.3.37"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.280",
