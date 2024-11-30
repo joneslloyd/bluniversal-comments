@@ -12,8 +12,9 @@ Bluniversal Comments is a Chrome Extension enabling "universal comments" via Blu
 
 1. Visit the **[Releases](https://github.com/joneslloyd/bluniversal-comments/releases)** page on the GitHub repository.
 
-2. **Chrome:**
-   Download the latest `chrome-extension.zip` file for the extension.
+2.
+**Chrome:**
+Download the latest `chrome-extension.zip` file for the extension.
 
 **Firefox:**
 Download the latest `firefox-extension.zip` file for the extension.
@@ -38,7 +39,20 @@ Download the latest `edge-extension.zip` file for the extension.
 3. Click the **Load Temporary Add-On** button.
 4. Select the directory containing the `.zip` file.
 
-### Step 3: Use the Extension
+### Step 3: Pin the Extension
+
+**Chrome and Edge**
+1. Click the Extensions icon
+2. Find the Extension in the list
+3. Click the pin (📌) icon next to it
+
+**Firefox**
+1. Click the Extensions icon
+2. Find the Extension in the list
+3. Click the cog (⚙️) icon next to it
+4. Click "Pin to toolbar"
+
+### Step 4: Use the Extension
 
 1. Open any supported webpage.
 2. Click the Bluniversal Comments extension icon in the browser toolbar.
