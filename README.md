@@ -1,5 +1,5 @@
 # Bluniversal Comments
-<img alt="Chrome" title="Chrome" src="https://github.com/user-attachments/assets/0c7ce099-5622-4ece-9085-05625f4e3ea5" width="32" />&nbsp;<img alt="Firefox" title="Firefox" src="https://github.com/user-attachments/assets/b5c7df03-217b-46f1-b073-48efe9f14dd6" width="32" />&nbsp;<img alt="Edge" title="Edge" src="https://github.com/user-attachments/assets/f343083e-3880-4e5d-83ba-7c3abd0f2d8d" width="32" />
+<a title="Chrome Extension" href="https://github.com/joneslloyd/bluniversal-comments/edit/main/README.md#chrome-1"><img alt="Chrome" title="Chrome" src="https://github.com/user-attachments/assets/0c7ce099-5622-4ece-9085-05625f4e3ea5" width="32" /></a>&nbsp;<a href="https://github.com/joneslloyd/bluniversal-comments/edit/main/README.md#firefox" title="Firefox Extension"><img alt="Firefox" title="Firefox" src="https://github.com/user-attachments/assets/b5c7df03-217b-46f1-b073-48efe9f14dd6" width="32" /></a>&nbsp;<a href="https://github.com/joneslloyd/bluniversal-comments/edit/main/README.md#edge" title="Edge Extension"><img alt="Edge" title="Edge" src="https://github.com/user-attachments/assets/f343083e-3880-4e5d-83ba-7c3abd0f2d8d" width="32" /></a>
 
 
 <img alt="Bluniversal Comments" title="Bluniversal Comments" src="https://github.com/user-attachments/assets/c72a7bf1-4633-4c3b-9df3-0acc82939bd8" width="800" />
@@ -11,23 +11,31 @@ Bluniversal Comments is a Chrome Extension enabling "universal comments" via Blu
 
 ## How to Use the Extension
 
-### Step 1: Download the Extension
+### Stable version
 
-1. Visit the **[Releases](https://github.com/joneslloyd/bluniversal-comments/releases)** page on the GitHub repository.
+#### Chrome
+[Download the Extension via the Chrome Web Store](https://chromewebstore.google.com/detail/bluniversal-comments/ecigkjcgabichgpbmeffblnbcbifighl).
 
-2.
-**Chrome:**
+### Latest (unstable) version
+
+#### Step 1: Download the Extension
+
+First, visit the **[Releases](https://github.com/joneslloyd/bluniversal-comments/releases)** page on the GitHub repository.
+
+Then, depending on your browser:
+
+##### Chrome
 Download the latest `chrome-extension.zip` file for the extension.
 
-**Firefox:**
+##### Firefox
 Download the latest `firefox-extension.zip` file for the extension.
 
-**Edge:**
+##### Edge
 Download the latest `edge-extension.zip` file for the extension.
 
-### Step 2: Install the Extension
+#### Step 2: Install the Extension
 
-**Chrome and Edge**
+##### Chrome & Edge
 
 1. Unpackage the `.zip` file to a directory on your computer.
 2. Open Chrome and navigate to `chrome://extensions/`.
@@ -35,36 +43,36 @@ Download the latest `edge-extension.zip` file for the extension.
 4. Click the **Load unpacked** button.
 5. Select the directory where you unpackaged the `.zip` file.
 
-**Firefox**
+##### Firefox
 
 1. Download the `.zip` file to a directory on your computer, but don't unpackage it.
 2. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`.
 3. Click the **Load Temporary Add-On** button.
 4. Select the directory containing the `.zip` file.
 
-### Step 3: Pin the Extension
+#### Step 3: Pin the Extension
 
-**Chrome and Edge**
+##### Chrome & Edge
 1. Click the Extensions icon
 2. Find the Extension in the list
 3. Click the pin (📌) icon next to it
 
-**Firefox**
+##### Firefox
 1. Click the Extensions icon
 2. Find the Extension in the list
 3. Click the cog (⚙️) icon next to it
 4. Click "Pin to toolbar"
 
-### Step 4: Use the Extension
+#### Step 4: Use the Extension
 
 1. Open any supported webpage.
 2. Click the Bluniversal Comments extension icon in the browser toolbar.
 3. Log in to your Bluesky account using your username and app password – A new tab should open automatically, but if not:
 
-**Chrome and Edge:**
+##### Chrome & Edge
 Navigate to the **Options** page (accessible by right-clicking on the extension icon and then Options).
 
-**Firefox:**
+##### Firefox
 In the Temporary Extension page, click the three dots (...) icon next to the Bluniversal Comments Extension, and then click Preferences.
 
 4. Once logged in, go to any web page and interact with existing Bluesky discussions or start a new thread for the page you're viewing.
