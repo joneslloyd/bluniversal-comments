@@ -1,9 +1,8 @@
 # Bluniversal Comments
+
 <a title="Chrome Extension" href="https://github.com/joneslloyd/bluniversal-comments?tab=readme-ov-file#chrome-1"><img alt="Chrome" title="Chrome" src="https://github.com/user-attachments/assets/0c7ce099-5622-4ece-9085-05625f4e3ea5" width="32" /></a>&nbsp;<a href="https://github.com/joneslloyd/bluniversal-comments?tab=readme-ov-file#firefox" title="Firefox Extension"><img alt="Firefox" title="Firefox" src="https://github.com/user-attachments/assets/b5c7df03-217b-46f1-b073-48efe9f14dd6" width="32" /></a>&nbsp;<a href="https://github.com/joneslloyd/bluniversal-comments?tab=readme-ov-file#edge" title="Edge Extension"><img alt="Edge" title="Edge" src="https://github.com/user-attachments/assets/f343083e-3880-4e5d-83ba-7c3abd0f2d8d" width="32" /></a>
 
-
 <img alt="Bluniversal Comments" title="Bluniversal Comments" src="https://github.com/user-attachments/assets/c72a7bf1-4633-4c3b-9df3-0acc82939bd8" width="800" />
-
 
 Bluniversal Comments is a Chrome Extension enabling "universal comments" via Bluesky, directly on web pages. With this extension, you can view, comment, and engage with Bluesky discussions linked to any web page.
 
@@ -14,6 +13,7 @@ Bluniversal Comments is a Chrome Extension enabling "universal comments" via Blu
 ### Stable version
 
 #### Chrome
+
 [Download the Extension via the Chrome Web Store](https://chromewebstore.google.com/detail/bluniversal-comments/ecigkjcgabichgpbmeffblnbcbifighl).
 
 ### Latest (unstable) version
@@ -25,12 +25,15 @@ First, visit the **[Releases](https://github.com/joneslloyd/bluniversal-comments
 Then, depending on your browser:
 
 ##### Chrome
+
 Download the latest `chrome-extension.zip` file for the extension.
 
 ##### Firefox
+
 Download the latest `firefox-extension.zip` file for the extension.
 
 ##### Edge
+
 Download the latest `edge-extension.zip` file for the extension.
 
 #### Step 2: Install the Extension
@@ -53,11 +56,13 @@ Download the latest `edge-extension.zip` file for the extension.
 #### Step 3: Pin the Extension
 
 ##### Chrome & Edge
+
 1. Click the Extensions icon
 2. Find the Extension in the list
 3. Click the pin (📌) icon next to it
 
 ##### Firefox
+
 1. Click the Extensions icon
 2. Find the Extension in the list
 3. Click the cog (⚙️) icon next to it
@@ -70,9 +75,11 @@ Download the latest `edge-extension.zip` file for the extension.
 3. Log in to your Bluesky account using your username and app password – A new tab should open automatically, but if not:
 
 ##### Chrome & Edge
+
 Navigate to the **Options** page (accessible by right-clicking on the extension icon and then Options).
 
 ##### Firefox
+
 In the Temporary Extension page, click the three dots (...) icon next to the Bluniversal Comments Extension, and then click Preferences.
 
 4. Once logged in, go to any web page and interact with existing Bluesky discussions or start a new thread for the page you're viewing.

@@ -10,7 +10,7 @@ export default defineConfig({
     return {
       manifest_version: 3,
       name: "Bluniversal Comments",
-      version: "1.0",
+      version: "1.0.2",
       description:
         "Universal comments with Bluesky! Displays a Bluesky comments feed for the current page.",
       permissions: isFirefox
@@ -37,9 +37,7 @@ export default defineConfig({
             "https://public.api.bsky.app/*",
           ],
       content_security_policy: {
-        extension_pages: isDevelopment
-          ? "script-src 'self' 'unsafe-eval' 'unsafe-inline' http://localhost:*; object-src 'self'; connect-src ws://localhost:*;"
-          : "script-src 'self'; object-src 'self';",
+        extension_pages: "script-src 'self'; object-src 'self';",
       },
       ...(isFirefox && {
         browser_specific_settings: {
