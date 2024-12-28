@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
+import i18n from "../../i18nConfig";
 import "./BskyReply.css";
 
 interface BskyReplyProps {
@@ -25,7 +26,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({
 
   const handleReply = async () => {
     if (!replyText.trim()) {
-      setError("Reply text cannot be empty.");
+      setError(i18n.__("reply_text_cannot_be_empty"));
       return;
     }
 
@@ -55,7 +56,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({
       await onReplySuccess();
     } catch (err) {
       console.error("Failed to post reply:", err);
-      setError("Failed to post reply. Please try again.");
+      setError(i18n.__("failed_to_post_reply_please_try_again"));
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +72,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({
           <textarea
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
-            placeholder="Write your reply..."
+            placeholder={i18n.__("write_your_reply")}
             style={{
               width: "100%",
               padding: "8px",
@@ -95,7 +96,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({
                 marginRight: "5px",
               }}
             >
-              {isLoading ? "Sending..." : "Send"}
+              {isLoading ? i18n.__("sending") : i18n.__("send")}
             </button>
             <button
               onClick={() => setIsReplying(false)}
@@ -108,7 +109,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({
                 cursor: "pointer",
               }}
             >
-              Cancel
+              {i18n.__("cancel")}
             </button>
           </div>
           {error && <p style={{ color: "red" }}>{error}</p>}
@@ -125,7 +126,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({
             cursor: "pointer",
           }}
         >
-          Reply
+          {i18n.__("reply")}
         </button>
       )}
     </div>

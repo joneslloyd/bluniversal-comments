@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AppBskyFeedDefs, AppBskyFeedPost } from "@atproto/api";
 import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
 import BskyReply from "./BskyReply";
+import i18n from "../../i18nConfig";
 import "./BskyComments.css";
 
 interface BskyCommentsProps {
@@ -43,11 +44,11 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
           setRootData({ uri: thread.post.uri, cid: thread.post.cid });
         }
       } else {
-        setError("Thread not found or access blocked.");
+        setError(i18n.__("thread_not_found_or_access_blocked"));
       }
     } catch (err) {
       console.error("Failed to load replies:", err);
-      setError("Failed to load comments.");
+      setError(i18n.__("failed_to_load_comments"));
     }
   };
 
@@ -86,7 +87,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
         }}
       >
         <p style={{ color: "red", fontSize: "14px" }}>
-          You are not logged in. Please go to the options page to log in.
+          {i18n.__("not_logged_in_please_log_in")}{" "}
         </p>
         <button
           style={{
@@ -100,7 +101,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
           }}
           onClick={() => chrome.runtime.openOptionsPage()}
         >
-          Open Options Page
+          {i18n.__("open_options_page")}
         </button>
       </div>
     );
@@ -178,7 +179,8 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
           {record.text}
         </p>
         <p style={{ color: "#999", fontSize: "12px", textAlign: "left" }}>
-          {post.likeCount ?? 0} likes • {post.replyCount ?? 0} replies
+          {post.likeCount ?? 0} {i18n.__("likes")} • {post.replyCount ?? 0}{" "}
+          {i18n.__("replies")}
         </p>
 
         <BskyReply
@@ -222,7 +224,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
                     cursor: "pointer",
                   }}
                 >
-                  Show more comments
+                  {i18n.__("show_more_comments")}
                 </button>
               )}
             </>
@@ -235,7 +237,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
                 marginTop: "20px",
               }}
             >
-              No comments yet. Be the first to start the discussion!
+              {i18n.__("no_comments_yet_start_discussion")}{" "}
             </p>
           )}
           {rootData && (
@@ -247,7 +249,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
           )}
         </div>
       ) : (
-        <p>Loading comments...</p>
+        <p>{i18n.__("loading_comments")}</p>
       )}
     </div>
   );
