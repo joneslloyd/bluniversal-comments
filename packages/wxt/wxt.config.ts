@@ -10,7 +10,7 @@ export default defineConfig({
     return {
       manifest_version: 3,
       name: "Bluniversal Comments",
-      version: "1.0.5",
+      version: "1.0.6",
       description:
         "Universal comments with Bluesky! Displays a Bluesky comments feed for the current page.",
       permissions: isFirefox
