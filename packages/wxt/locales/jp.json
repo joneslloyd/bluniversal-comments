@@ -1,0 +1,19 @@
+{
+  "thread_not_found_or_access_blocked": "スレッドが見つからないか、アクセスがブロックされています。",
+  "failed_to_load_comments": "コメントの読み込みに失敗しました。",
+  "not_logged_in_please_log_in": "ログインしていません。オプションページでログインしてください。",
+  "open_options_page": "オプションページを開く",
+  "likes": "いいね",
+  "replies": "返信",
+  "show_more_comments": "さらにコメントを表示",
+  "no_comments_yet_start_discussion": "まだコメントがありません。最初にディスカッションを始めましょう！",
+  "loading_comments": "コメントを読み込んでいます...",
+  "reply_text_cannot_be_empty": "返信テキストを空にすることはできません。",
+  "failed_to_post_reply_please_try_again": "返信の投稿に失敗しました。もう一度お試しください。",
+  "write_your_reply": "返信を書く...",
+  "sending": "送信中...",
+  "send": "送信",
+  "cancel": "キャンセル",
+  "reply": "返信",
+  "page_not_supported_for_bluesky_comments": "このページはBlueskyコメントをサポートしていません。"
+}

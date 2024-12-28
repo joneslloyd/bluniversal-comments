@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import i18n from "../../i18nConfig";
 import { createNewPost, maybeInitializeDevModeAgent } from "../utils";
 import { searchForPost } from "../../../functions/src/utils";
 import BskyComments from "./BskyComments";
@@ -20,13 +21,19 @@ const App: React.FC = () => {
   const agentManager = new BlueskyAgentManager();
 
   useEffect(() => {
+    const browserLanguage = navigator.language || navigator.languages[0];
+    const languageCode = browserLanguage ? browserLanguage.split("-")[0] : "en";
+    i18n.setLocale(languageCode);
+  }, []);
+
+  useEffect(() => {
     maybeInitializeDevModeAgent(agentManager);
   }, []);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
       if (tab.url && !isValidUrl(tab.url)) {
-        setErrorMessage("This page is not supported for Bluesky comments.");
+        setErrorMessage(i18n.__("page_not_supported_for_bluesky_comments"));
         return;
       }
       setTabInfo({
@@ -45,7 +52,9 @@ const App: React.FC = () => {
         const isLoggedIn = await agentManager.isLoggedIn();
         if (!isLoggedIn) {
           setErrorMessage(
-            "Please go to the options page and enter your Bluesky username and password.",
+            i18n.__(
+              "Please go to the options page and enter your Bluesky username and password.",
+            ),
           );
           return;
         }
@@ -55,10 +64,12 @@ const App: React.FC = () => {
         const normalizedUrl = normalizeUrl(url);
         const hashedTag = await generateTaggedUrl(normalizedUrl);
 
-        setStatusMessage("Searching for existing posts...");
+        setStatusMessage(i18n.__("Searching for existing posts..."));
         let existingPostUri = await searchForPost(hashedTag);
         if (!existingPostUri) {
-          setStatusMessage("No existing post found. Creating a new post...");
+          setStatusMessage(
+            i18n.__("No existing post found. Creating a new post..."),
+          );
           const sessionData = await agentManager.getSessionFromStorage();
           if (sessionData) {
             existingPostUri = await createNewPost(
@@ -68,14 +79,18 @@ const App: React.FC = () => {
             );
           } else {
             console.error("Failed to retrieve session data from storage.");
-            setErrorMessage("Failed to initialize the post. Please try again.");
+            setErrorMessage(
+              i18n.__("Failed to initialize the post. Please try again."),
+            );
           }
         }
         setPostUri(existingPostUri);
         setStatusMessage("");
       } catch (error) {
         console.error("Error during post initialization:", error);
-        setErrorMessage("Failed to initialize the post. Please try again.");
+        setErrorMessage(
+          i18n.__("Failed to initialize the post. Please try again."),
+        );
       } finally {
         setCreatingPost(false);
       }

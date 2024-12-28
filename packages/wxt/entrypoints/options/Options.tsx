@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import i18n from "../../i18nConfig";
 import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
 import { maybeInitializeDevModeAgent } from "../utils";
 
@@ -16,7 +17,7 @@ const Options: React.FC = () => {
     const initialize = async () => {
       try {
         await maybeInitializeDevModeAgent(agentManager);
-        await checkSessionStatus(); // Check the session only after dev mode init
+        await checkSessionStatus();
       } catch (error) {
         console.error("Error during initialization:", error);
         setStatusMessage("Initialization failed. Please log in.");
@@ -26,7 +27,7 @@ const Options: React.FC = () => {
     };
 
     initialize();
-  }, []); // Runs only once on component mount
+  }, []);
 
   const checkSessionStatus = async () => {
     try {
@@ -212,7 +213,7 @@ const Options: React.FC = () => {
                 : "green",
           }}
         >
-          {statusMessage}
+          {i18n.__(statusMessage)}
         </p>
       )}
     </div>

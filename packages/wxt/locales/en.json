@@ -1,0 +1,19 @@
+{
+  "thread_not_found_or_access_blocked": "Thread not found or access blocked.",
+  "failed_to_load_comments": "Failed to load comments.",
+  "not_logged_in_please_log_in": "You are not logged in. Please go to the options page to log in.",
+  "open_options_page": "Open Options Page",
+  "likes": "likes",
+  "replies": "replies",
+  "show_more_comments": "Show more comments",
+  "no_comments_yet_start_discussion": "No comments yet. Be the first to start the discussion!",
+  "loading_comments": "Loading comments...",
+  "reply_text_cannot_be_empty": "Reply text cannot be empty.",
+  "failed_to_post_reply_please_try_again": "Failed to post reply. Please try again.",
+  "write_your_reply": "Write your reply...",
+  "sending": "Sending...",
+  "send": "Send",
+  "cancel": "Cancel",
+  "reply": "Reply",
+  "page_not_supported_for_bluesky_comments": "This page is not supported for Bluesky comments."
+}

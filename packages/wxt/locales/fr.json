@@ -1,0 +1,19 @@
+{
+  "thread_not_found_or_access_blocked": "Fil introuvable ou accès bloqué.",
+  "failed_to_load_comments": "Échec du chargement des commentaires.",
+  "not_logged_in_please_log_in": "Vous n'êtes pas connecté. Veuillez vous connecter sur la page des options.",
+  "open_options_page": "Ouvrir la page des options",
+  "likes": "j'aimes",
+  "replies": "réponses",
+  "show_more_comments": "Afficher plus de commentaires",
+  "no_comments_yet_start_discussion": "Pas encore de commentaires. Soyez le premier à commencer la discussion !",
+  "loading_comments": "Chargement des commentaires...",
+  "reply_text_cannot_be_empty": "Le texte de la réponse ne peut pas être vide.",
+  "failed_to_post_reply_please_try_again": "Échec de la publication de la réponse. Veuillez réessayer.",
+  "write_your_reply": "Écrivez votre réponse...",
+  "sending": "Envoi...",
+  "send": "Envoyer",
+  "cancel": "Annuler",
+  "reply": "Répondre",
+  "page_not_supported_for_bluesky_comments": "Cette page ne prend pas en charge les commentaires Bluesky."
+}
