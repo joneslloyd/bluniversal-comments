@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import i18n from "../../i18nConfig";
 import { createNewPost, maybeInitializeDevModeAgent } from "../utils";
 import { searchForPost } from "../../../functions/src/utils";
 import BskyComments from "./BskyComments";
-import "./App.css";
 import { generateTaggedUrl } from "@bluniversal-comments/core/utils";
 import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
+import { useTranslation } from "react-i18next";
+import "./App.css";
 
 interface TabInfo {
   url: string;
@@ -13,6 +13,7 @@ interface TabInfo {
 }
 
 const App: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const [tabInfo, setTabInfo] = useState<TabInfo | null>(null);
   const [postUri, setPostUri] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>("");
@@ -23,7 +24,8 @@ const App: React.FC = () => {
   useEffect(() => {
     const browserLanguage = navigator.language || navigator.languages[0];
     const languageCode = browserLanguage ? browserLanguage.split("-")[0] : "en";
-    i18n.setLocale(languageCode);
+    console.log({ languageCode });
+    i18n.changeLanguage(languageCode);
   }, []);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ const App: React.FC = () => {
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
       if (tab.url && !isValidUrl(tab.url)) {
-        setErrorMessage(i18n.__("page_not_supported_for_bluesky_comments"));
+        setErrorMessage(t("page_not_supported_for_bluesky_comments"));
         return;
       }
       setTabInfo({
@@ -52,7 +54,7 @@ const App: React.FC = () => {
         const isLoggedIn = await agentManager.isLoggedIn();
         if (!isLoggedIn) {
           setErrorMessage(
-            i18n.__(
+            t(
               "Please go to the options page and enter your Bluesky username and password.",
             ),
           );
@@ -64,12 +66,10 @@ const App: React.FC = () => {
         const normalizedUrl = normalizeUrl(url);
         const hashedTag = await generateTaggedUrl(normalizedUrl);
 
-        setStatusMessage(i18n.__("Searching for existing posts..."));
+        setStatusMessage(t("searching_for_existing_posts"));
         let existingPostUri = await searchForPost(hashedTag);
         if (!existingPostUri) {
-          setStatusMessage(
-            i18n.__("No existing post found. Creating a new post..."),
-          );
+          setStatusMessage(t("no_existing_post_found_creating_new_post"));
           const sessionData = await agentManager.getSessionFromStorage();
           if (sessionData) {
             existingPostUri = await createNewPost(
@@ -79,18 +79,14 @@ const App: React.FC = () => {
             );
           } else {
             console.error("Failed to retrieve session data from storage.");
-            setErrorMessage(
-              i18n.__("Failed to initialize the post. Please try again."),
-            );
+            setErrorMessage(t("failed_to_initialize_post_try_again"));
           }
         }
         setPostUri(existingPostUri);
         setStatusMessage("");
       } catch (error) {
         console.error("Error during post initialization:", error);
-        setErrorMessage(
-          i18n.__("Failed to initialize the post. Please try again."),
-        );
+        setErrorMessage(t("failed_to_initialize_post_try_again"));
       } finally {
         setCreatingPost(false);
       }

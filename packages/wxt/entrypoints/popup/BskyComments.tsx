@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AppBskyFeedDefs, AppBskyFeedPost } from "@atproto/api";
 import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
 import BskyReply from "./BskyReply";
-import i18n from "../../i18nConfig";
+import { useTranslation } from "react-i18next";
 import "./BskyComments.css";
 
 interface BskyCommentsProps {
@@ -10,6 +10,7 @@ interface BskyCommentsProps {
 }
 
 const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
+  const { t } = useTranslation();
   const [replies, setReplies] = useState<
     AppBskyFeedDefs.ThreadViewPost[] | null
   >(null);
@@ -44,11 +45,11 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
           setRootData({ uri: thread.post.uri, cid: thread.post.cid });
         }
       } else {
-        setError(i18n.__("thread_not_found_or_access_blocked"));
+        setError(t("thread_not_found_or_access_blocked"));
       }
     } catch (err) {
       console.error("Failed to load replies:", err);
-      setError(i18n.__("failed_to_load_comments"));
+      setError(t("failed_to_load_comments"));
     }
   };
 
@@ -87,7 +88,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
         }}
       >
         <p style={{ color: "red", fontSize: "14px" }}>
-          {i18n.__("not_logged_in_please_log_in")}{" "}
+          {t("not_logged_in_please_log_in")}{" "}
         </p>
         <button
           style={{
@@ -101,7 +102,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
           }}
           onClick={() => chrome.runtime.openOptionsPage()}
         >
-          {i18n.__("open_options_page")}
+          {t("open_options_page")}
         </button>
       </div>
     );
@@ -179,8 +180,8 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
           {record.text}
         </p>
         <p style={{ color: "#999", fontSize: "12px", textAlign: "left" }}>
-          {post.likeCount ?? 0} {i18n.__("likes")} • {post.replyCount ?? 0}{" "}
-          {i18n.__("replies")}
+          {post.likeCount ?? 0} {t("likes")} • {post.replyCount ?? 0}{" "}
+          {t("replies")}
         </p>
 
         <BskyReply
@@ -224,7 +225,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
                     cursor: "pointer",
                   }}
                 >
-                  {i18n.__("show_more_comments")}
+                  {t("show_more_comments")}
                 </button>
               )}
             </>
@@ -237,7 +238,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
                 marginTop: "20px",
               }}
             >
-              {i18n.__("no_comments_yet_start_discussion")}{" "}
+              {t("no_comments_yet_start_discussion")}{" "}
             </p>
           )}
           {rootData && (
@@ -249,7 +250,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
           )}
         </div>
       ) : (
-        <p>{i18n.__("loading_comments")}</p>
+        <p>{t("loading_comments")}</p>
       )}
     </div>
   );

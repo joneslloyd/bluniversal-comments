@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
-import i18n from "../../i18nConfig";
 import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
 import { maybeInitializeDevModeAgent } from "../utils";
+import { useTranslation } from "react-i18next";
 
 const Options: React.FC = () => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [sessionValid, setSessionValid] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true); // Unified loading state
+  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
 
   const agentManager = new BlueskyAgentManager();
@@ -17,50 +18,50 @@ const Options: React.FC = () => {
     const initialize = async () => {
       try {
         await maybeInitializeDevModeAgent(agentManager);
-        await checkSessionStatus();
+        await checkSessionStatus(t);
       } catch (error) {
         console.error("Error during initialization:", error);
-        setStatusMessage("Initialization failed. Please log in.");
+        setStatusMessage(t("initialization_failed_please_log_in"));
       } finally {
         setLoading(false);
       }
     };
 
     initialize();
-  }, []);
+  }, [t]);
 
-  const checkSessionStatus = async () => {
+  const checkSessionStatus = async (t: any) => {
     try {
       const agent = await agentManager.getAgent();
       if (agent.session?.accessJwt) {
         setSessionValid(true);
         setUsername(agent.session.handle || "");
-        setStatusMessage("Active session verified.");
+        setStatusMessage(t("active_session_verified"));
       } else {
         setSessionValid(false);
-        setStatusMessage("No active session found. Please log in.");
+        setStatusMessage(t("no_active_session_found_please_log_in"));
       }
     } catch (error) {
       console.error("Error verifying session:", error);
       setSessionValid(false);
-      setStatusMessage("Failed to verify session. Please log in.");
+      setStatusMessage(t("failed_to_verify_session_please_log_in"));
     }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatusMessage("Logging in...");
+    setStatusMessage(t("logging_in"));
     setLoading(true);
 
     try {
       await agentManager.logout();
       await agentManager.login(username, password);
       setSessionValid(true);
-      setStatusMessage("Logged in successfully!");
+      setStatusMessage(t("logged_in_successfully"));
       setEditing(false);
     } catch (error: any) {
       setSessionValid(false);
-      setStatusMessage(`Error: ${error.message}`);
+      setStatusMessage(t("error_logging_in", { error: error.message }));
     } finally {
       setLoading(false);
     }
@@ -75,15 +76,15 @@ const Options: React.FC = () => {
 
   return (
     <div style={{ fontFamily: "Arial, sans-serif", padding: "20px" }}>
-      <h1>Bluniversal Comments – Log in to Bluesky</h1>
+      <h1>{t("bluniversal_comments_login_to_bluesky")}</h1>
 
       {loading ? (
-        <p>Loading...</p>
+        <p>{t("loading")}</p>
       ) : sessionValid ? (
         !editing ? (
           <div>
             <p>
-              Authenticated as <strong>{username}</strong>.
+              {t("authenticated_as")} <strong>{username}</strong>.
             </p>
             <button
               onClick={handleEdit}
@@ -96,12 +97,12 @@ const Options: React.FC = () => {
                 cursor: "pointer",
               }}
             >
-              Edit Credentials
+              {t("edit_credentials")}
             </button>
           </div>
         ) : (
           <form onSubmit={handleLogin}>
-            <label htmlFor="username">Bluesky Username:</label>
+            <label htmlFor="username">{t("bluesky_username")}</label>
             <input
               type="text"
               id="username"
@@ -117,7 +118,7 @@ const Options: React.FC = () => {
               }}
               required
             />
-            <label htmlFor="password">App Password:</label>
+            <label htmlFor="password">{t("app_password")}</label>
             <input
               type="password"
               id="password"
@@ -146,13 +147,13 @@ const Options: React.FC = () => {
                 cursor: "pointer",
               }}
             >
-              Login
+              {t("login")}
             </button>
           </form>
         )
       ) : (
         <form onSubmit={handleLogin}>
-          <label htmlFor="username">Bluesky Username:</label>
+          <label htmlFor="username">{t("bluesky_username")}</label>
           <input
             type="text"
             id="username"
@@ -168,7 +169,7 @@ const Options: React.FC = () => {
             }}
             required
           />
-          <label htmlFor="password">App Password:</label>
+          <label htmlFor="password">{t("app_password")}</label>
           <input
             type="password"
             id="password"
@@ -197,11 +198,10 @@ const Options: React.FC = () => {
               cursor: "pointer",
             }}
           >
-            Login
+            {t("login")}
           </button>
         </form>
       )}
-
       {statusMessage && !loading && (
         <p
           style={{
@@ -213,7 +213,7 @@ const Options: React.FC = () => {
                 : "green",
           }}
         >
-          {i18n.__(statusMessage)}
+          {t(statusMessage)}
         </p>
       )}
     </div>

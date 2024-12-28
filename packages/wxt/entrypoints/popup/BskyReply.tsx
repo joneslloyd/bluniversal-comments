@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
-import i18n from "../../i18nConfig";
+import { useTranslation } from "react-i18next";
 import "./BskyReply.css";
 
 interface BskyReplyProps {
@@ -17,6 +17,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({
   rootData,
   onReplySuccess,
 }) => {
+  const { t } = useTranslation();
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +27,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({
 
   const handleReply = async () => {
     if (!replyText.trim()) {
-      setError(i18n.__("reply_text_cannot_be_empty"));
+      setError(t("reply_text_cannot_be_empty"));
       return;
     }
 
@@ -56,7 +57,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({
       await onReplySuccess();
     } catch (err) {
       console.error("Failed to post reply:", err);
-      setError(i18n.__("failed_to_post_reply_please_try_again"));
+      setError(t("failed_to_post_reply_please_try_again"));
     } finally {
       setIsLoading(false);
     }
@@ -72,7 +73,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({
           <textarea
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
-            placeholder={i18n.__("write_your_reply")}
+            placeholder={t("write_your_reply")}
             style={{
               width: "100%",
               padding: "8px",
@@ -96,7 +97,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({
                 marginRight: "5px",
               }}
             >
-              {isLoading ? i18n.__("sending") : i18n.__("send")}
+              {isLoading ? t("sending") : t("send")}
             </button>
             <button
               onClick={() => setIsReplying(false)}
@@ -109,7 +110,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({
                 cursor: "pointer",
               }}
             >
-              {i18n.__("cancel")}
+              {t("cancel")}
             </button>
           </div>
           {error && <p style={{ color: "red" }}>{error}</p>}
@@ -126,7 +127,7 @@ const BskyReply: React.FC<BskyReplyProps> = ({
             cursor: "pointer",
           }}
         >
-          {i18n.__("reply")}
+          {t("reply")}
         </button>
       )}
     </div>

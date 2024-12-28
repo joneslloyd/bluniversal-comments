@@ -15,5 +15,22 @@
   "send": "Send",
   "cancel": "Cancel",
   "reply": "Reply",
-  "page_not_supported_for_bluesky_comments": "This page is not supported for Bluesky comments."
+  "page_not_supported_for_bluesky_comments": "This page is not supported for Bluesky comments.",
+  "searching_for_existing_posts": "Searching for existing posts...",
+  "no_existing_post_found_creating_new_post": "No existing post found. Creating a new post...",
+  "failed_to_initialize_post_try_again": "Failed to initialize the post. Please try again.",
+  "initialization_failed_please_log_in": "Initialization failed. Please log in.",
+  "active_session_verified": "Active session verified.",
+  "no_active_session_found_please_log_in": "No active session found. Please log in.",
+  "failed_to_verify_session_please_log_in": "Failed to verify session. Please log in.",
+  "logging_in": "Logging in...",
+  "logged_in_successfully": "Logged in successfully!",
+  "error_logging_in": "Error logging in",
+  "bluniversal_comments_login_to_bluesky": "Bluniversal Comments – Log in to Bluesky",
+  "loading": "Loading...",
+  "authenticated_as": "Authenticated as",
+  "edit_credentials": "Edit Credentials",
+  "bluesky_username": "Bluesky Username:",
+  "app_password": "App Password:",
+  "login": "Login"
 }

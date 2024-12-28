@@ -15,5 +15,22 @@
   "send": "送信",
   "cancel": "キャンセル",
   "reply": "返信",
-  "page_not_supported_for_bluesky_comments": "このページはBlueskyコメントをサポートしていません。"
+  "page_not_supported_for_bluesky_comments": "このページはBlueskyコメントをサポートしていません。",
+  "searching_for_existing_posts": "既存の投稿を検索しています...",
+  "no_existing_post_found_creating_new_post": "既存の投稿が見つかりませんでした。新しい投稿を作成しています...",
+  "failed_to_initialize_post_try_again": "投稿の初期化に失敗しました。もう一度お試しください。",
+  "initialization_failed_please_log_in": "初期化に失敗しました。ログインしてください。",
+  "active_session_verified": "アクティブなセッションが確認されました。",
+  "no_active_session_found_please_log_in": "アクティブなセッションが見つかりません。ログインしてください。",
+  "failed_to_verify_session_please_log_in": "セッションの確認に失敗しました。ログインしてください。",
+  "logging_in": "ログイン中...",
+  "logged_in_successfully": "ログインに成功しました！",
+  "error_logging_in": "ログインエラー",
+  "bluniversal_comments_login_to_bluesky": "Bluniversal Comments – Blueskyにログイン",
+  "loading": "読み込み中...",
+  "authenticated_as": "として認証済み",
+  "edit_credentials": "資格情報を編集",
+  "bluesky_username": "Blueskyユーザー名：",
+  "app_password": "アプリのパスワード：",
+  "login": "ログイン"
 }

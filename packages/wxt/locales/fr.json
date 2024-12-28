@@ -15,5 +15,22 @@
   "send": "Envoyer",
   "cancel": "Annuler",
   "reply": "Répondre",
-  "page_not_supported_for_bluesky_comments": "Cette page ne prend pas en charge les commentaires Bluesky."
+  "page_not_supported_for_bluesky_comments": "Cette page ne prend pas en charge les commentaires Bluesky.",
+  "searching_for_existing_posts": "Recherche de publications existantes...",
+  "no_existing_post_found_creating_new_post": "Aucune publication existante trouvée. Création d'une nouvelle publication...",
+  "failed_to_initialize_post_try_again": "Échec de l'initialisation de la publication. Veuillez réessayer.",
+  "initialization_failed_please_log_in": "Échec de l'initialisation. Veuillez vous connecter.",
+  "active_session_verified": "Session active vérifiée.",
+  "no_active_session_found_please_log_in": "Aucune session active trouvée. Veuillez vous connecter.",
+  "failed_to_verify_session_please_log_in": "Échec de la vérification de la session. Veuillez vous connecter.",
+  "logging_in": "Connexion...",
+  "logged_in_successfully": "Connecté avec succès !",
+  "error_logging_in": "Erreur de connexion",
+  "bluniversal_comments_login_to_bluesky": "Bluniversal Comments – Connectez-vous à Bluesky",
+  "loading": "Chargement...",
+  "authenticated_as": "Authentifié en tant que",
+  "edit_credentials": "Modifier les identifiants",
+  "bluesky_username": "Nom d'utilisateur Bluesky :",
+  "app_password": "Mot de passe de l'application :",
+  "login": "Connexion"
 }
