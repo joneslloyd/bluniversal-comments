@@ -6,13 +6,15 @@ import enTranslations from "./locales/en.json";
 import frTranslations from "./locales/fr.json";
 import jpTranslations from "./locales/jp.json";
 
+const isDevMode = import.meta.env.MODE === "development";
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    debug: true,
+    debug: isDevMode,
     detection: {
-      caches: []
+      caches: [],
     },
     fallbackLng: "en",
     interpolation: {
@@ -20,13 +22,13 @@ i18n
     },
     resources: {
       en: {
-        translation: enTranslations
+        translation: enTranslations,
       },
       fr: {
-        translation: frTranslations
+        translation: frTranslations,
       },
       ja: {
-        translation: jpTranslations
+        translation: jpTranslations,
       },
     },
   });

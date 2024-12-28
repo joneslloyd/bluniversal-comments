@@ -9,8 +9,9 @@ export default defineBackground(() => {
 const runAmplitude = () => {
   // Do not track anything more than the install and browser type
   amplitude.init("3f5227f9da39547b9e7c806154c12715", undefined, {
-    identityStorage: "sessionStorage",
     autocapture: false,
+    defaultTracking: false,
+    identityStorage: "sessionStorage",
   });
   browser.runtime.onInstalled.addListener(({ reason }) => {
     if (reason === "install") {
