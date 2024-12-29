@@ -91,14 +91,7 @@ export const normalizeUrl = (url: string): string => {
     const parsedUrl = new URL(url);
     parsedUrl.hostname = parsedUrl.hostname.replace(/^www\./, "");
     parsedUrl.hash = "";
-    const paramsToRemove = [
-      "utm_source",
-      "utm_medium",
-      "utm_campaign",
-      "utm_term",
-      "utm_content",
-    ];
-    paramsToRemove.forEach((param) => parsedUrl.searchParams.delete(param));
+    parsedUrl.search = "";
     parsedUrl.pathname = parsedUrl.pathname.replace(/\/+$/, "");
     return parsedUrl.toString().toLowerCase();
   } catch {
