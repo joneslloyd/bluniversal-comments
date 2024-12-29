@@ -106,6 +106,23 @@ export const normalizeUrl = (url: string): string => {
   }
 };
 
+export class PostStorage {
+  private static readonly MASTER_KEY = "bluniversalCommentsPosts";
+
+  static async getPostUriForUrl(url: string): Promise<string | null> {
+    const storedData = await browser.storage.local.get(this.MASTER_KEY);
+    const posts = storedData[this.MASTER_KEY] || {};
+    return posts[url] || null;
+  }
+
+  static async setPostUriForUrl(url: string, postUri: string): Promise<void> {
+    const storedData = await browser.storage.local.get(this.MASTER_KEY);
+    const posts = storedData[this.MASTER_KEY] || {};
+    posts[url] = postUri;
+    await browser.storage.local.set({ [this.MASTER_KEY]: posts });
+  }
+}
+
 export const maybeInitializeDevModeAgent = async (
   agentManager: BlueskyAgentManager,
 ) => {

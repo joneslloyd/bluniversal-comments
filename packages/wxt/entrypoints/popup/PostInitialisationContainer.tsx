@@ -1,8 +1,10 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { generateTaggedUrl } from "@bluniversal-comments/core/utils";
+import React, { useEffect, useState } from "react";
+import {
+  BlueskyAgentManager,
+  generateTaggedUrl,
+} from "@bluniversal-comments/core/utils";
 import { searchForPost } from "../../../functions/src/utils";
-import { createNewPost, normalizeUrl } from "../utils";
-import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
+import { createNewPost, normalizeUrl, PostStorage } from "../utils";
 import { StatusState, TabInfo } from "../types";
 
 interface PostInitialisationContainerProps {
@@ -13,10 +15,10 @@ interface PostInitialisationContainerProps {
     noExistingPostFoundCreatingNewMessage: string;
     failedToInitializePostTryAgainMessage: string;
   };
-  postUri: string | null;
   onPostUriChange: (postUri: string | null) => void;
   onStatusChange: (status: StatusState) => void;
   Spinner: React.FC<{ show: boolean; loadingText: string }>;
+  agentManager: BlueskyAgentManager;
 }
 
 const PostInitialisationContainer: React.FC<
@@ -24,11 +26,12 @@ const PostInitialisationContainer: React.FC<
 > = ({
   tabInfo,
   messages,
-  postUri,
   onPostUriChange,
   onStatusChange,
   Spinner,
+  agentManager,
 }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [showSpinner, setShowSpinner] = useState(false);
   const {
     notLoggedInPleaseLogInMessage,
@@ -37,11 +40,30 @@ const PostInitialisationContainer: React.FC<
     failedToInitializePostTryAgainMessage,
   } = messages;
 
-  const agentManager = useMemo(() => new BlueskyAgentManager(), []);
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const isLoggedIn = await agentManager.isLoggedIn();
+      setIsLoggedIn(isLoggedIn);
+    };
+    checkLoggedIn();
+  }, [agentManager]);
 
   useEffect(() => {
     const initializePost = async () => {
-      if (!tabInfo || postUri) return;
+      if (!tabInfo) return;
+
+      const normalizedUrl = normalizeUrl(tabInfo.url);
+
+      const storedPostUri = await PostStorage.getPostUriForUrl(normalizedUrl);
+      if (storedPostUri) {
+        onPostUriChange(storedPostUri);
+        onStatusChange({
+          type: "info",
+          message: "",
+          isLoading: false,
+        });
+        return;
+      }
 
       onStatusChange({
         type: "loading",
@@ -50,7 +72,6 @@ const PostInitialisationContainer: React.FC<
       });
 
       try {
-        const isLoggedIn = await agentManager.isLoggedIn();
         if (!isLoggedIn) {
           onStatusChange({
             type: "error",
@@ -60,12 +81,11 @@ const PostInitialisationContainer: React.FC<
           return;
         }
 
-        const normalizedUrl = normalizeUrl(tabInfo.url);
         const hashedTag = await generateTaggedUrl(normalizedUrl);
-
         const existingPostUri = await searchForPost(hashedTag);
 
         if (existingPostUri) {
+          await PostStorage.setPostUriForUrl(normalizedUrl, existingPostUri);
           onPostUriChange(existingPostUri);
           onStatusChange({
             type: "info",
@@ -100,6 +120,7 @@ const PostInitialisationContainer: React.FC<
           setShowSpinner(false);
 
           if (newPostUri) {
+            await PostStorage.setPostUriForUrl(normalizedUrl, newPostUri);
             onPostUriChange(newPostUri);
             onStatusChange({
               type: "info",
@@ -122,7 +143,7 @@ const PostInitialisationContainer: React.FC<
     };
 
     initializePost();
-  }, [tabInfo, postUri, onPostUriChange, onStatusChange, agentManager]);
+  }, [tabInfo, onPostUriChange, onStatusChange, isLoggedIn]);
 
   return (
     <>{showSpinner && <Spinner show={true} loadingText="Creating post..." />}</>

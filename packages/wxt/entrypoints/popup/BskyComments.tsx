@@ -1,82 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AppBskyFeedDefs, AppBskyFeedPost } from "@atproto/api";
-import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
 import BskyReply from "./BskyReply";
-import { useTranslation } from "react-i18next";
 import "./BskyComments.css";
 
 interface BskyCommentsProps {
   postUri: string;
+  isLoggedIn: boolean;
+  error: string | null;
+  replies: AppBskyFeedDefs.ThreadViewPost[] | null;
+  rootData: { uri: string; cid: string } | null;
+  onFetchReplies: (depth?: number) => Promise<void>;
+  messages: {
+    notLoggedInPleaseLogInMessage: string;
+    openOptionsPageMessage: string;
+    likesMessage: string;
+    repliesMessage: string;
+    showMoreCommentsMessage: string;
+    noCommentsYetStartDiscussionMessage: string;
+    loadingCommentsMessage: string;
+  };
 }
 
-const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
-  const { t } = useTranslation();
-  const [replies, setReplies] = useState<
-    AppBskyFeedDefs.ThreadViewPost[] | null
-  >(null);
-  const [error, setError] = useState<string | null>(null);
+const BskyComments: React.FC<BskyCommentsProps> = ({
+  postUri,
+  isLoggedIn,
+  error,
+  replies,
+  rootData,
+  onFetchReplies,
+  messages,
+}) => {
   const [visibleCount, setVisibleCount] = useState<number>(3);
-  const [rootData, setRootData] = useState<{
-    uri: string;
-    cid: string;
-  } | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
-  const agentManager = new BlueskyAgentManager();
-
-  const fetchReplies = async (depth: number = 3) => {
-    try {
-      const agent = await agentManager.getAgent();
-      const response = await agent.getPostThread({ uri: postUri, depth });
-
-      if (AppBskyFeedDefs.isThreadViewPost(response.data.thread)) {
-        const thread = response.data.thread;
-
-        if (thread.replies) {
-          const topLevelReplies = thread.replies.filter((reply) =>
-            AppBskyFeedDefs.isThreadViewPost(reply),
-          ) as AppBskyFeedDefs.ThreadViewPost[];
-          setReplies(topLevelReplies);
-        } else {
-          setReplies([]);
-        }
-
-        if (thread.post.cid) {
-          setRootData({ uri: thread.post.uri, cid: thread.post.cid });
-        }
-      } else {
-        setError(t("thread_not_found_or_access_blocked"));
-      }
-    } catch (err) {
-      console.error("Failed to load replies:", err);
-      setError(t("failed_to_load_comments"));
-    }
-  };
-
-  useEffect(() => {
-    const initialize = async () => {
-      try {
-        const isInitialized = await agentManager.initialize();
-        setIsLoggedIn(isInitialized);
-
-        if (isInitialized) {
-          await fetchReplies();
-        }
-      } catch {
-        setIsLoggedIn(false);
-      }
-    };
-
-    initialize();
-
-    const intervalId = setInterval(() => {
-      if (isLoggedIn) {
-        fetchReplies();
-      }
-    }, 60000);
-
-    return () => clearInterval(intervalId);
-  }, [postUri, isLoggedIn]);
 
   if (!isLoggedIn) {
     return (
@@ -88,7 +42,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
         }}
       >
         <p style={{ color: "red", fontSize: "14px" }}>
-          {t("not_logged_in_please_log_in")}{" "}
+          {messages.notLoggedInPleaseLogInMessage}{" "}
         </p>
         <button
           style={{
@@ -102,7 +56,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
           }}
           onClick={() => browser.runtime.openOptionsPage()}
         >
-          {t("open_options_page")}
+          {messages.openOptionsPageMessage}
         </button>
       </div>
     );
@@ -180,16 +134,14 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
           {record.text}
         </p>
         <p style={{ color: "#999", fontSize: "12px", textAlign: "left" }}>
-          {post.likeCount ?? 0} {t("likes")} • {post.replyCount ?? 0}{" "}
-          {t("replies")}
+          {post.likeCount ?? 0} {messages.likesMessage} • {post.replyCount ?? 0}{" "}
+          {messages.repliesMessage}
         </p>
-
         <BskyReply
           parentUri={post.uri}
           rootData={rootData || { uri: postUri, cid: "" }}
-          onReplySuccess={fetchReplies}
+          onReplySuccess={onFetchReplies}
         />
-
         {reply.replies &&
           reply.replies.slice(0, visibleCount).map((childReply) => {
             if (AppBskyFeedDefs.isThreadViewPost(childReply)) {
@@ -225,7 +177,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
                     cursor: "pointer",
                   }}
                 >
-                  {t("show_more_comments")}
+                  {messages.showMoreCommentsMessage}
                 </button>
               )}
             </>
@@ -238,19 +190,19 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
                 marginTop: "20px",
               }}
             >
-              {t("no_comments_yet_start_discussion")}{" "}
+              {messages.noCommentsYetStartDiscussionMessage}{" "}
             </p>
           )}
           {rootData && (
             <BskyReply
               parentUri={postUri}
               rootData={rootData}
-              onReplySuccess={fetchReplies}
+              onReplySuccess={onFetchReplies}
             />
           )}
         </div>
       ) : (
-        <p>{t("loading_comments")}</p>
+        <p>{messages.loadingCommentsMessage}</p>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import BskyComments from "./BskyComments";
+import BskyCommentsContainer from "./BskyCommentsContainer";
 import ModalContainer from "./ModalContainer";
 import SharePromptModal from "./SharePromptModal";
 import Spinner from "./Spinner";
@@ -44,20 +44,23 @@ const App: React.FC = () => {
     [t],
   );
 
-  // Modal
   const shareExperienceTitleMessage = useMemo(
     () => t("share_experience_title"),
     [t],
   );
-
   const dismissMessage = useMemo(() => t("dismiss"), [t]);
-
   const sendMessage = useMemo(() => t("send"), [t]);
-
   const defaultPostContentMessage = useMemo(
     () => t("default_post_content"),
     [t],
   );
+
+  useEffect(() => {
+    const initializeAgentManager = async () => {
+      await agentManager.initialize();
+    };
+    initializeAgentManager();
+  }, [agentManager]);
 
   const handleTabInfoChange = useCallback(
     (tabInfo: TabInfo | null, errorMessage: string | null) => {
@@ -104,9 +107,10 @@ const App: React.FC = () => {
             <p>{status.message}</p>
           </div>
           {postUri && (
-            <div id="comments-container">
-              <BskyComments postUri={postUri} />
-            </div>
+            <BskyCommentsContainer
+              postUri={postUri}
+              agentManager={agentManager}
+            />
           )}
         </>
       )}
@@ -122,10 +126,10 @@ const App: React.FC = () => {
           failedToInitializePostTryAgainMessage,
         }}
         tabInfo={tabInfo}
-        postUri={postUri}
         onPostUriChange={handlePostUriChange}
         onStatusChange={handleStatusChange}
         Spinner={Spinner}
+        agentManager={agentManager}
       />
       <DevModeAgentContainer agentManager={agentManager} />
       <ModalContainer>
