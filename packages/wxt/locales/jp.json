@@ -32,5 +32,9 @@
   "edit_credentials": "資格情報を編集",
   "bluesky_username": "Blueskyユーザー名：",
   "app_password": "アプリのパスワード：",
-  "login": "ログイン"
+  "login": "ログイン",
+  "share_experience_title": "Bluniversal Commentsについて投稿する",
+  "share_experience_message": "Bluniversal Commentsについて投稿して会話を始めましょう！",
+  "dismiss": "閉じる",
+  "default_post_content": "Bluniversal Commentsを使って、どのウェブページでも会話を始めることができます。ぜひ参加してください！ 🦋💬 https://github.com/joneslloyd/bluniversal-comments?tab=readme-ov-file#how-to-use-the-extension #BluniversalComments"
 }

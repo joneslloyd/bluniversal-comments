@@ -32,5 +32,9 @@
   "edit_credentials": "Hitelesítő adatok szerkesztése",
   "bluesky_username": "Bluesky felhasználónév:",
   "app_password": "Alkalmazás jelszó:",
-  "login": "Bejelentkezés"
+  "login": "Bejelentkezés",
+  "share_experience_title": "Bejegyzés a Bluniversal Comments-ről",
+  "share_experience_message": "Segítsen elindítani a beszélgetést a Bluniversal Comments-ről való bejegyzéssel!",
+  "dismiss": "Elutasít",
+  "default_post_content": "A Bluniversal Comments segítségével bármely weboldalon beszélgetést kezdeményezhetek. Csatlakozz hozzám! 🦋💬 https://github.com/joneslloyd/bluniversal-comments?tab=readme-ov-file#how-to-use-the-extension #BluniversalComments"
 }

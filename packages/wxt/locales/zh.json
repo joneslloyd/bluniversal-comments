@@ -32,5 +32,9 @@
   "edit_credentials": "编辑凭证",
   "bluesky_username": "Bluesky用户名：",
   "app_password": "应用密码：",
-  "login": "登录"
+  "login": "登录",
+  "share_experience_title": "发布关于Bluniversal Comments的内容",
+  "share_experience_message": "通过发布关于Bluniversal Comments的内容来帮助展开对话！",
+  "dismiss": "忽略",
+  "default_post_content": "我正在使用Bluniversal Comments在任何网页上开始对话。加入我吧！ 🦋💬 https://github.com/joneslloyd/bluniversal-comments?tab=readme-ov-file#how-to-use-the-extension #BluniversalComments"
 }

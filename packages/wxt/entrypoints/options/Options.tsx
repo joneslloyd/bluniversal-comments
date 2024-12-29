@@ -7,7 +7,9 @@ const Options: React.FC = () => {
   const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<
+    { type: "error" | "info"; message: string } | undefined
+  >(undefined);
   const [sessionValid, setSessionValid] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -21,7 +23,10 @@ const Options: React.FC = () => {
         await checkSessionStatus(t);
       } catch (error) {
         console.error("Error during initialization:", error);
-        setStatusMessage(t("initialization_failed_please_log_in"));
+        setStatusMessage({
+          type: "error",
+          message: t("initialization_failed_please_log_in"),
+        });
       } finally {
         setLoading(false);
       }
@@ -36,32 +41,44 @@ const Options: React.FC = () => {
       if (agent.session?.accessJwt) {
         setSessionValid(true);
         setUsername(agent.session.handle || "");
-        setStatusMessage(t("active_session_verified"));
+        setStatusMessage({
+          type: "info",
+          message: t("active_session_verified"),
+        });
       } else {
         setSessionValid(false);
-        setStatusMessage(t("no_active_session_found_please_log_in"));
+        setStatusMessage({
+          type: "error",
+          message: t("no_active_session_found_please_log_in"),
+        });
       }
     } catch (error) {
       console.error("Error verifying session:", error);
       setSessionValid(false);
-      setStatusMessage(t("failed_to_verify_session_please_log_in"));
+      setStatusMessage({
+        type: "error",
+        message: t("failed_to_verify_session_please_log_in"),
+      });
     }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatusMessage(t("logging_in"));
+    setStatusMessage({ type: "info", message: t("logging_in") });
     setLoading(true);
 
     try {
       await agentManager.logout();
       await agentManager.login(username, password);
       setSessionValid(true);
-      setStatusMessage(t("logged_in_successfully"));
+      setStatusMessage({ type: "info", message: t("logged_in_successfully") });
       setEditing(false);
     } catch (error: any) {
       setSessionValid(false);
-      setStatusMessage(t("error_logging_in", { error: error.message }));
+      setStatusMessage({
+        type: "error",
+        message: t("error_logging_in", { error: error.message }),
+      });
     } finally {
       setLoading(false);
     }
@@ -206,14 +223,10 @@ const Options: React.FC = () => {
         <p
           style={{
             marginTop: "20px",
-            color:
-              statusMessage.includes("Error") ||
-              statusMessage.includes("No active")
-                ? "red"
-                : "green",
+            color: statusMessage.type === "error" ? "red" : "green",
           }}
         >
-          {t(statusMessage)}
+          {statusMessage.message}
         </p>
       )}
     </div>
