@@ -2,7 +2,7 @@
 
 <a title="Chrome Extension" href="https://github.com/joneslloyd/bluniversal-comments?tab=readme-ov-file#chrome-1"><img alt="Chrome" title="Chrome" src="https://github.com/user-attachments/assets/0c7ce099-5622-4ece-9085-05625f4e3ea5" width="32" /></a>&nbsp;<a href="https://github.com/joneslloyd/bluniversal-comments?tab=readme-ov-file#firefox" title="Firefox Extension"><img alt="Firefox" title="Firefox" src="https://github.com/user-attachments/assets/b5c7df03-217b-46f1-b073-48efe9f14dd6" width="32" /></a>&nbsp;<a href="https://github.com/joneslloyd/bluniversal-comments?tab=readme-ov-file#edge" title="Edge Extension"><img alt="Edge" title="Edge" src="https://github.com/user-attachments/assets/f343083e-3880-4e5d-83ba-7c3abd0f2d8d" width="32" /></a>
 
-Available in: 🇬🇧, 🇫🇷 and 🇯🇵
+Available in: 🇬🇧, 🇭🇺, 🇨🇳, 🇫🇷 and 🇯🇵
 
 <img alt="Bluniversal Comments" title="Bluniversal Comments" src="https://github.com/user-attachments/assets/c72a7bf1-4633-4c3b-9df3-0acc82939bd8" width="800" />
 
