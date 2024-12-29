@@ -122,6 +122,7 @@ const App: React.FC = () => {
           failedToInitializePostTryAgainMessage,
         }}
         tabInfo={tabInfo}
+        postUri={postUri}
         onPostUriChange={handlePostUriChange}
         onStatusChange={handleStatusChange}
         Spinner={Spinner}

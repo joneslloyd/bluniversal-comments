@@ -13,6 +13,7 @@ interface PostInitialisationContainerProps {
     noExistingPostFoundCreatingNewMessage: string;
     failedToInitializePostTryAgainMessage: string;
   };
+  postUri: string | null;
   onPostUriChange: (postUri: string | null) => void;
   onStatusChange: (status: StatusState) => void;
   Spinner: React.FC<{ show: boolean; loadingText: string }>;
@@ -20,7 +21,14 @@ interface PostInitialisationContainerProps {
 
 const PostInitialisationContainer: React.FC<
   PostInitialisationContainerProps
-> = ({ tabInfo, messages, onPostUriChange, onStatusChange, Spinner }) => {
+> = ({
+  tabInfo,
+  messages,
+  postUri,
+  onPostUriChange,
+  onStatusChange,
+  Spinner,
+}) => {
   const [showSpinner, setShowSpinner] = useState(false);
   const {
     notLoggedInPleaseLogInMessage,
@@ -33,7 +41,7 @@ const PostInitialisationContainer: React.FC<
 
   useEffect(() => {
     const initializePost = async () => {
-      if (!tabInfo) return;
+      if (!tabInfo || postUri) return;
 
       onStatusChange({
         type: "loading",
