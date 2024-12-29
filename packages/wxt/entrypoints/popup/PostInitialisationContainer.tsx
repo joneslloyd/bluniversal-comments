@@ -53,7 +53,6 @@ const PostInitialisationContainer: React.FC<
       if (!tabInfo) return;
 
       const normalizedUrl = normalizeUrl(tabInfo.url);
-
       const storedPostUri = await PostStorage.getPostUriForUrl(normalizedUrl);
       if (storedPostUri) {
         onPostUriChange(storedPostUri);

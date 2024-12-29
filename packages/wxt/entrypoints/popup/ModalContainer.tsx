@@ -1,4 +1,5 @@
 import React, { useEffect, useState, ReactNode } from "react";
+import * as amplitude from "@amplitude/analytics-browser";
 
 interface ModalContainerProps {
   children: ReactNode;
@@ -9,9 +10,12 @@ const ModalContainer: React.FC<ModalContainerProps> = ({ children }) => {
 
   useEffect(() => {
     const checkInstallDuration = async () => {
-      const { installTime, modalDismissed } = await browser.storage.local.get([
-        "installTime",
-        "modalDismissed",
+      const {
+        "bluniversalComments:installTime": installTime,
+        "bluniversalComments:modalDismissed": modalDismissed,
+      } = await browser.storage.local.get([
+        "bluniversalComments:installTime",
+        "bluniversalComments:modalDismissed",
       ]);
       const currentTime = Date.now();
       const oneHour = 60 * 60 * 1000;
@@ -30,8 +34,15 @@ const ModalContainer: React.FC<ModalContainerProps> = ({ children }) => {
   }, []);
 
   const handleCloseModal = () => {
+    amplitude.logEvent("PLG Modal: Dismiss Message Clicked");
     setShowModal(false);
-    browser.storage.local.set({ modalDismissed: true });
+    browser.storage.local.set({ ["bluniversalComments:modalDismissed"]: true });
+  };
+
+  const handleSendMessage = () => {
+    amplitude.logEvent("PLG Modal: Send Message Clicked");
+    setShowModal(false);
+    browser.storage.local.set({ ["bluniversalComments:modalDismissed"]: true });
   };
 
   return (
@@ -39,6 +50,7 @@ const ModalContainer: React.FC<ModalContainerProps> = ({ children }) => {
       {showModal &&
         React.cloneElement(children as React.ReactElement<any>, {
           onClose: handleCloseModal,
+          onSend: handleSendMessage,
         })}
     </>
   );

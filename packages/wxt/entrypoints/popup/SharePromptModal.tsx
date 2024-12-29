@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 interface SharePromptModalProps {
   onClose?: () => void | undefined;
+  onSend?: () => void | undefined;
   messages: {
     defaultPostContentMessage: string;
     shareExperienceTitleMessage: string;
@@ -12,6 +13,7 @@ interface SharePromptModalProps {
 
 const SharePromptModal: React.FC<SharePromptModalProps> = ({
   onClose,
+  onSend,
   messages,
 }) => {
   const {
@@ -24,6 +26,7 @@ const SharePromptModal: React.FC<SharePromptModalProps> = ({
   const [postContent, setPostContent] = useState(defaultPostContentMessage);
 
   const handleSend = () => {
+    onSend && onSend();
     const encodedContent = encodeURIComponent(postContent);
     const composeUrl = `https://bsky.app/intent/compose?text=${encodedContent}`;
     window.open(composeUrl, "_blank");

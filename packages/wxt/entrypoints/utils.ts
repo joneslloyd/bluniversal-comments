@@ -100,7 +100,7 @@ export const normalizeUrl = (url: string): string => {
 };
 
 export class PostStorage {
-  private static readonly MASTER_KEY = "bluniversalCommentsPosts";
+  private static readonly MASTER_KEY = "bluniversalComments:Posts";
 
   static async getPostUriForUrl(url: string): Promise<string | null> {
     const storedData = await browser.storage.local.get(this.MASTER_KEY);

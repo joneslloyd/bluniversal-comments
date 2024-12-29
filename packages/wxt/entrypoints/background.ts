@@ -25,7 +25,9 @@ const runAmplitude = () => {
 const setListeners = () => {
   browser.runtime.onInstalled.addListener(({ reason }) => {
     if (reason === "install") {
-      browser.storage.local.set({ installTime: Date.now() });
+      browser.storage.local.set({
+        ["bluniversalComments:installTime"]: Date.now(),
+      });
     }
   });
 };
