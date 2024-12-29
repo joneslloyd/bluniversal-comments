@@ -122,7 +122,7 @@ const PostInitialisationContainer: React.FC<
     };
 
     initializePost();
-  }, [tabInfo, onPostUriChange, onStatusChange, agentManager]);
+  }, [tabInfo, postUri, onPostUriChange, onStatusChange, agentManager]);
 
   return (
     <>{showSpinner && <Spinner show={true} loadingText="Creating post..." />}</>
