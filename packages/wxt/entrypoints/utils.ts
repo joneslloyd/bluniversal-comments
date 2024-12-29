@@ -37,7 +37,6 @@ export async function createNewPost(
 
   const data = await response.json();
 
-  // Return the URI of the newly created post
   return data.uri;
 }
 
@@ -58,7 +57,7 @@ export async function refreshAccessToken(
     throw new Error("Failed to refresh access token");
   }
   const data = await response.json();
-  chrome.storage.sync.set({
+  browser.storage.sync.set({
     blueskyAccessJwt: data.accessJwt,
     blueskyRefreshJwt: data.refreshJwt,
     blueskyDid: data.did,
@@ -85,6 +84,26 @@ export const getBrowserType = (): string => {
   }
 
   return browserType;
+};
+
+export const normalizeUrl = (url: string): string => {
+  try {
+    const parsedUrl = new URL(url);
+    parsedUrl.hostname = parsedUrl.hostname.replace(/^www\./, "");
+    parsedUrl.hash = "";
+    const paramsToRemove = [
+      "utm_source",
+      "utm_medium",
+      "utm_campaign",
+      "utm_term",
+      "utm_content",
+    ];
+    paramsToRemove.forEach((param) => parsedUrl.searchParams.delete(param));
+    parsedUrl.pathname = parsedUrl.pathname.replace(/\/+$/, "");
+    return parsedUrl.toString().toLowerCase();
+  } catch {
+    return url.toLowerCase();
+  }
 };
 
 export const maybeInitializeDevModeAgent = async (

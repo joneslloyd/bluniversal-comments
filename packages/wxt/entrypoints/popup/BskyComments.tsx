@@ -100,7 +100,7 @@ const BskyComments: React.FC<BskyCommentsProps> = ({ postUri }) => {
             borderRadius: "4px",
             cursor: "pointer",
           }}
-          onClick={() => chrome.runtime.openOptionsPage()}
+          onClick={() => browser.runtime.openOptionsPage()}
         >
           {t("open_options_page")}
         </button>

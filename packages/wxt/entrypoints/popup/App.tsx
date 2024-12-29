@@ -1,108 +1,107 @@
-import React, { useEffect, useState } from "react";
-import { createNewPost, maybeInitializeDevModeAgent } from "../utils";
-import { searchForPost } from "../../../functions/src/utils";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import BskyComments from "./BskyComments";
-import { generateTaggedUrl } from "@bluniversal-comments/core/utils";
+import ModalContainer from "./ModalContainer";
+import SharePromptModal from "./SharePromptModal";
+import Spinner from "./Spinner";
+import TabInfoContainer from "./TabInfoContainer";
+import PostInitialisationContainer from "./PostInitialisationContainer";
+import DevModeAgentContainer from "./DevModeAgentContainer";
 import { BlueskyAgentManager } from "@bluniversal-comments/core/utils";
 import { useTranslation } from "react-i18next";
+import { StatusState, TabInfo } from "../types";
 import "./App.css";
-
-interface TabInfo {
-  url: string;
-  title: string;
-}
 
 const App: React.FC = () => {
   const { t, i18n } = useTranslation();
   const [tabInfo, setTabInfo] = useState<TabInfo | null>(null);
   const [postUri, setPostUri] = useState<string | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [creatingPost, setCreatingPost] = useState<boolean>(false);
-  const agentManager = new BlueskyAgentManager();
+  const [status, setStatus] = useState<StatusState>({
+    type: "info",
+    message: "",
+    isLoading: false,
+  });
+
+  const agentManager = useMemo(() => new BlueskyAgentManager(), []);
+
+  const pageNotSupportedMessage = useMemo(
+    () => t("page_not_supported_for_bluesky_comments"),
+    [t],
+  );
+  const notLoggedInPleaseLogInMessage = useMemo(
+    () => t("not_logged_in_please_log_in"),
+    [t],
+  );
+  const searchingForExistingPostsMessage = useMemo(
+    () => t("searching_for_existing_posts"),
+    [t],
+  );
+  const noExistingPostFoundCreatingNewMessage = useMemo(
+    () => t("no_existing_post_found_creating_new_post"),
+    [t],
+  );
+  const failedToInitializePostTryAgainMessage = useMemo(
+    () => t("failed_to_initialize_post_try_again"),
+    [t],
+  );
+
+  // Modal
+  const shareExperienceTitleMessage = useMemo(
+    () => t("share_experience_title"),
+    [t],
+  );
+
+  const dismissMessage = useMemo(() => t("dismiss"), [t]);
+
+  const sendMessage = useMemo(() => t("send"), [t]);
+
+  const defaultPostContentMessage = useMemo(
+    () => t("default_post_content"),
+    [t],
+  );
+
+  const handleTabInfoChange = useCallback(
+    (tabInfo: TabInfo | null, errorMessage: string | null) => {
+      if (errorMessage) {
+        setStatus({
+          type: "error",
+          message: errorMessage,
+          isLoading: false,
+        });
+      } else {
+        setTabInfo(tabInfo);
+      }
+    },
+    [],
+  );
+
+  const handlePostUriChange = useCallback((newPostUri: string | null) => {
+    setPostUri(newPostUri);
+  }, []);
+
+  const handleStatusChange = useCallback((newStatus: StatusState) => {
+    setStatus(newStatus);
+  }, []);
 
   useEffect(() => {
     const browserLanguage = navigator.language || navigator.languages[0];
     const languageCode = browserLanguage ? browserLanguage.split("-")[0] : "en";
-    console.log({ languageCode });
     i18n.changeLanguage(languageCode);
   }, []);
 
-  useEffect(() => {
-    maybeInitializeDevModeAgent(agentManager);
-  }, []);
-
-  useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-      if (tab.url && !isValidUrl(tab.url)) {
-        setErrorMessage(t("page_not_supported_for_bluesky_comments"));
-        return;
-      }
-      setTabInfo({
-        url: tab.url || "",
-        title: tab.title || "",
-      });
-    });
-  }, []);
-
-  useEffect(() => {
-    const initializePost = async () => {
-      if (!tabInfo || creatingPost) return;
-      try {
-        setCreatingPost(true);
-
-        const isLoggedIn = await agentManager.isLoggedIn();
-        if (!isLoggedIn) {
-          setErrorMessage(
-            t(
-              "Please go to the options page and enter your Bluesky username and password.",
-            ),
-          );
-          return;
-        }
-
-        const { url, title } = tabInfo;
-
-        const normalizedUrl = normalizeUrl(url);
-        const hashedTag = await generateTaggedUrl(normalizedUrl);
-
-        setStatusMessage(t("searching_for_existing_posts"));
-        let existingPostUri = await searchForPost(hashedTag);
-        if (!existingPostUri) {
-          setStatusMessage(t("no_existing_post_found_creating_new_post"));
-          const sessionData = await agentManager.getSessionFromStorage();
-          if (sessionData) {
-            existingPostUri = await createNewPost(
-              normalizedUrl,
-              title,
-              sessionData,
-            );
-          } else {
-            console.error("Failed to retrieve session data from storage.");
-            setErrorMessage(t("failed_to_initialize_post_try_again"));
-          }
-        }
-        setPostUri(existingPostUri);
-        setStatusMessage("");
-      } catch (error) {
-        console.error("Error during post initialization:", error);
-        setErrorMessage(t("failed_to_initialize_post_try_again"));
-      } finally {
-        setCreatingPost(false);
-      }
-    };
-
-    initializePost();
-  }, [tabInfo]);
-
   return (
-    <div style={{ padding: "10px", fontFamily: "Arial, sans-serif" }}>
-      {errorMessage ? (
-        <p style={{ color: "red" }}>{errorMessage}</p>
+    <div
+      style={{
+        position: "relative",
+        margin: "10px",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      {status.type === "error" ? (
+        <p style={{ color: "red" }}>{status.message}</p>
       ) : (
         <>
           <div id="status-container">
-            <p>{statusMessage}</p>
+            <p>{status.message}</p>
           </div>
           {postUri && (
             <div id="comments-container">
@@ -111,42 +110,36 @@ const App: React.FC = () => {
           )}
         </>
       )}
+      <TabInfoContainer
+        onTabInfoChange={handleTabInfoChange}
+        pageNotSupportedMessage={pageNotSupportedMessage}
+      />
+      <PostInitialisationContainer
+        messages={{
+          notLoggedInPleaseLogInMessage,
+          searchingForExistingPostsMessage,
+          noExistingPostFoundCreatingNewMessage,
+          failedToInitializePostTryAgainMessage,
+        }}
+        tabInfo={tabInfo}
+        postUri={postUri}
+        onPostUriChange={handlePostUriChange}
+        onStatusChange={handleStatusChange}
+        Spinner={Spinner}
+      />
+      <DevModeAgentContainer agentManager={agentManager} />
+      <ModalContainer>
+        <SharePromptModal
+          messages={{
+            defaultPostContentMessage,
+            shareExperienceTitleMessage,
+            dismissMessage,
+            sendMessage,
+          }}
+        />
+      </ModalContainer>
     </div>
   );
 };
-
-function normalizeUrl(url: string): string {
-  try {
-    const parsedUrl = new URL(url);
-    parsedUrl.hostname = parsedUrl.hostname.replace(/^www\./, "");
-    parsedUrl.hash = "";
-    const paramsToRemove = [
-      "utm_source",
-      "utm_medium",
-      "utm_campaign",
-      "utm_term",
-      "utm_content",
-    ];
-    paramsToRemove.forEach((param) => parsedUrl.searchParams.delete(param));
-    parsedUrl.pathname = parsedUrl.pathname.replace(/\/+$/, "");
-    return parsedUrl.toString().toLowerCase();
-  } catch {
-    return url.toLowerCase();
-  }
-}
-
-function isValidUrl(url: string): boolean {
-  try {
-    const parsedUrl = new URL(url);
-    return (
-      parsedUrl.protocol !== "about:" &&
-      parsedUrl.protocol !== "chrome-extension:" &&
-      !parsedUrl.hostname.includes("localhost") &&
-      !parsedUrl.hostname.includes("newtab")
-    );
-  } catch {
-    return false;
-  }
-}
 
 export default App;

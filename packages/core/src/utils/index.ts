@@ -143,7 +143,7 @@ export class BlueskyAgentManager {
             active: true,
           });
 
-          return true; // Session is now valid
+          return true;
         } catch (refreshError) {
           console.error("Session refresh failed:", refreshError);
           return false;

@@ -32,5 +32,9 @@
   "edit_credentials": "Modifier les identifiants",
   "bluesky_username": "Nom d'utilisateur Bluesky :",
   "app_password": "Mot de passe de l'application :",
-  "login": "Connexion"
+  "login": "Connexion",
+  "share_experience_title": "Publier à propos de Bluniversal Comments",
+  "share_experience_message": "Aidez à lancer la conversation en publiant à propos de Bluniversal Comments !",
+  "dismiss": "Ignorer",
+  "default_post_content": "J'utilise Bluniversal Comments pour démarrer une conversation sur n'importe quelle page web. Rejoignez-moi ! 🦋💬 https://github.com/joneslloyd/bluniversal-comments?tab=readme-ov-file#how-to-use-the-extension #BluniversalComments"
 }
