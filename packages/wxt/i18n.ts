@@ -6,7 +6,7 @@ import enTranslations from "./locales/en.json";
 import frTranslations from "./locales/fr.json";
 import jpTranslations from "./locales/jp.json";
 
-const isDevMode = import.meta.env.MODE === "development";
+const isDevMode = import.meta.env?.MODE === "development" ?? false;
 
 i18n
   .use(LanguageDetector)

@@ -126,8 +126,8 @@ export class PostStorage {
 export const maybeInitializeDevModeAgent = async (
   agentManager: BlueskyAgentManager,
 ) => {
-  const devUsername = import.meta.env.WXT_BS_DEV_USERNAME;
-  const devPassword = import.meta.env.WXT_BS_DEV_PASSWORD;
+  const devUsername = import.meta.env.WXT_BS_DEV_USERNAME?.trim();
+  const devPassword = import.meta.env.WXT_BS_DEV_PASSWORD?.trim();
 
   if (devUsername && devPassword) {
     await agentManager.login(devUsername, devPassword);
